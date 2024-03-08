@@ -31,3 +31,8 @@ body {
     text-wrap: balance;
   }
 }
+/* styles.css atau styles.module.css */
+body {
+  font-family: 'Poppins', sans-serif;
+}
+
