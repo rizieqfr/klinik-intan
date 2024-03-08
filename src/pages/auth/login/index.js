@@ -1,7 +1,9 @@
 import Link from 'next/link'
+import { useRouter } from 'next/router'
 import React from 'react'
 
 export default function Login() {
+    const router = useRouter()
   return (
     <div className='min-h-screen'>
         <div className='mx-[299px] my-[120px] bg-white rounded-lg px-[43px] py-[200px] shadow '>
@@ -24,7 +26,7 @@ export default function Login() {
                         <div>
                             <Link href={'/auth/register'}>Don't have an account? <span className='text-cyan font-semibold'>Register!</span></Link>
                         </div>
-                        <button className='bg-cyan text-white px-[163px] py-[20px] w-full rounded-md font-medium'>Sign in</button>
+                        <button onClick={() => router.push('/dashboard')} className='bg-cyan text-white px-[163px] py-[20px] w-full rounded-md font-medium'>Sign in</button>
                     </div>
                 </div>
 

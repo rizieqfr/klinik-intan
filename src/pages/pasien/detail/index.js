@@ -8,7 +8,7 @@ export default function DetailPasien() {
         <div className='w-full pr-[80px]'>
             <div className='flex items-center justify-between pt-[64px] mb-[32px]'>
                 <h1 className='text-[32px] text-[#353A40] font-semibold'>Pasien</h1>
-                <h1>Navigasi / Pasien <span className='text-cyan font-medium'>Detail Pasien</span></h1>
+                <h1>Navigasi / Pasien / <span className='text-cyan font-medium'>Detail Pasien</span></h1>
             </div>
             <div className='bg-white py-[39px] px-[32px] rounded-2xl'>
                 <h1 className='text-[24px] text-[#353A40] font-semibold mb-[32px]'>Detail Pasien</h1>
@@ -30,7 +30,7 @@ export default function DetailPasien() {
                 <hr className='border my-[32px]'/>
                 <h1 className='text-[24px] text-[#353A40] font-semibold mb-[32px]'>Daftar Rekam Medis</h1>
                 
-                <div className='space-y-[12px] pr-[126px]'>
+                <div className='space-y-[12px]'>
                     <div className='space-y-[12px] w-full'>
                         <div className='flex items-center w-full gap-[26px]'>
                             <h1 className='text-[24px] font-semibold'>1.</h1>

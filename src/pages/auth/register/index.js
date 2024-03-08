@@ -1,6 +1,8 @@
+import { useRouter } from 'next/router'
 import React from 'react'
 
 export default function Register() {
+    const router = useRouter()
   return (
     <div>
         <div className='min-h-screen'>
@@ -30,7 +32,7 @@ export default function Register() {
                                     <option value="Pasien">Pasien</option>
                                 </select>
                             </div>
-                            <button className='bg-cyan text-white px-[163px] py-[20px] w-full rounded-md font-medium'>Register</button>
+                            <button onClick={() => router.push('/auth/login')} className='bg-cyan text-white px-[163px] py-[20px] w-full rounded-md font-medium'>Register</button>
                         </div>
                     </div>
 
