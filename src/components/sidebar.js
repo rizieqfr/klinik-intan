@@ -1,20 +1,38 @@
 import { useRouter } from 'next/router'
 import { FaBars, FaBookMedical, FaHandHoldingMedical, FaUserGear } from "react-icons/fa6";
 import { FaHome } from "react-icons/fa";
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { MdMedicalServices } from "react-icons/md";
 import { RiAdminFill, RiLogoutBoxFill } from "react-icons/ri";
+import Api from '../pages/api/hello';
 
 export default function Sidebar() {
     const router = useRouter()
-    console.log(router, 'route')
+    const [name, setName] = useState()
+    const [role, setRole] = useState()
+    
+    // const fetch = async () => {
+    //     try {
+    //         const response = await Api.Fetch(localStorage.getItem('token'))
+    //         console.log(response)
+    //         setName(response.data.username)
+    //         setRole(response.data.role)
+    //     } catch (error) {
+    //         console.log(error)
+    //         router.push('/')
+    //     }
+    // }
+
+    // useEffect(() => {
+    //     fetch()
+    // }, [])
   return (
     <div className='bg-[#353A40] text-white w-[288px] py-[30px]'>
         <div className='flex items-center justify-around px-[24px] text-[14px] mb-[50px] border-b pb-4'>
             <div className='w-[46px] h-[46px] rounded-full bg-slate-300 flex items-center justify-center'>
                 <RiAdminFill className='text-black text-xl' />
             </div>
-            <h1>Admin - Rizieq </h1>
+            <h1>{role} - {name} </h1>
         </div>
         <div className='space-y-[8px]'>
             <button onClick={() => router.push('/dashboard')} className={`${router.pathname === '/dashboard' && 'bg-[#0179FF]'} hover:bg-[#0179FF] py-[8px] px-[37px] text-white font-semibold w-full flex items-center gap-2`}>
