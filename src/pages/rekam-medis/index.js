@@ -1,5 +1,7 @@
+import Table from '@/components/Table'
 import Modal from '@/components/modal'
 import Sidebar from '@/components/sidebar'
+import { useRouter } from 'next/router'
 import React, { useState } from 'react'
 import { FaCirclePlus } from 'react-icons/fa6'
 import { FiSearch } from 'react-icons/fi'
@@ -7,6 +9,37 @@ import { FiSearch } from 'react-icons/fi'
 export default function RekamMedis() {
     const [showAddModal, setShowAddModal] = useState(false)
     const [showEditModal, setShowEditModal] = useState(false)
+    const route = useRouter()
+    const kolomRekamMedis = [
+        {
+            header: 'No',
+            accessorKey: 'id',
+        },
+        {
+            header: 'Nama',
+            accessorKey: 'nama',
+        },
+        {
+            header: 'Tanggal',
+            accessorKey: 'nik',
+        },
+        {
+            header: 'Jenis Pelayanan',
+            accessorKey: 'alamat',
+        },
+        {
+            accessorKey: 'id',
+            header: () => <div></div>,
+            cell: ({row}) => (
+                <td className='flex justify-center'>
+                    <button onClick={() => route.push('pasien/detail')} className='bg-[#0080CC] text-white rounded px-[14px] py-[3px] font-semibold text-sm mr-2'>Detail</button>
+                    <button onClick={() => setShowEditModal(!showEditModal)} className='bg-[#FEC107] text-white rounded px-[14px] py-[3px] font-semibold text-sm mr-2'>Edit</button>
+                    <button className='bg-[#FF0000] text-white rounded px-[14px] py-[3px] font-semibold text-sm'>Hapus</button>
+                </td>
+            )
+        
+        }
+    ]
   return (
     <div>
         <Modal 
@@ -91,47 +124,18 @@ export default function RekamMedis() {
         />
         <div className='bg-[#ECEFF4] flex gap-[32px] min-h-screen'>
             <Sidebar />
-            <div className='w-full'>
-                <div className='flex items-center justify-between pr-[78px] pt-[80px] mb-4'>
-                    <h1 className='text-[32px] text-[#353A40] font-semibold'>Rekam Medis</h1>
+            <div className='w-full pr-[32px]'>
+                <div className='flex items-center justify-between pt-[40px] mb-4'>
+                    <h1 className='text-4xl text-[#353A40] font-bold'>Rekam Medis</h1>
                     <h1>Navigasi / <span className='text-cyan font-medium'>Rekam Medis</span></h1>
                 </div>
-                <div className='flex items-center justify-between pr-[126px] mb-4'>
-                    <div className='flex items-center justify-center w-[325px] gap-3 bg-white py-[10px] rounded-full'>
-                        <FiSearch className='text-black text-xl ml-5'/>
-                        <input type="text" className='outline-none w-full mr-3 text-[14px]' placeholder='Search Rekam Medis...' />
-                    </div>
+                <div className='flex items-center justify-end mb-4'>
                     <button onClick={() => setShowAddModal(!showAddModal)} className='flex items-center justify-center gap-3 py-[14px] bg-[#0179FF] px-[30px] rounded text-white font-medium'>
                         <FaCirclePlus className='text-xl' />
                         <h1>Tambah</h1>
                     </button>
                 </div>
-                <div className='space-y-[12px] pr-[126px]'>
-                    <div className='space-y-[12px] w-full'>
-                        <div className='flex items-center w-full gap-[26px]'>
-                            <h1 className='text-[24px] font-semibold'>1.</h1>
-                            <div className='w-full'>
-                                <h1 className='text-[16px] font-semibold'>Muh Rizieq Fazlulrahman</h1>
-                                <div className='flex items-center justify-between'>
-                                    <div className='flex items-center'>
-                                        <h1 className='text-[#272C2D99]'>Tanggal</h1>
-                                        <h1>: 12/12/2024</h1>
-                                    </div>
-                                    <div className='flex items-center'>
-                                        <h1 className='text-[#272C2D99]'>Nomor Rekam Medis</h1>
-                                        <h1>: 21516</h1>
-                                    </div>
-                                </div>
-                            </div>
-                            <div className='flex items-center justify-end gap-4 w-full'>
-                                <button className='bg-[#0080CC] text-white rounded px-[14px] py-[3px] font-semibold text-sm'>Detail</button>
-                                <button onClick={() => setShowEditModal(!showEditModal)} className='bg-[#FEC107] text-white rounded px-[14px] py-[3px] font-semibold text-sm'>Edit</button>
-                                <button className='bg-[#FF0000] text-white rounded px-[14px] py-[3px] font-semibold text-sm'>Hapus</button>
-                            </div>
-                        </div>
-                        <hr className='border border-[#353A4066]'/>
-                    </div>
-                </div>
+                <Table data={''} columns={kolomRekamMedis} />
             </div>
         </div>
     </div>

@@ -11,9 +11,7 @@ export default function Pasien() {
     const [showAddModal, setShowAddModal] = useState(false)
     const [showEditModal, setShowEditModal] = useState(false)
     const [data, setData] = useState([]);
-
-    useEffect(() => {
-        const fetchData = async () => {
+    const fetchData = async () => {
         try {
             const response = await fetch('https://662d2f180547cdcde9e029ab.mockapi.io/monitoring');
             if (!response.ok) {
@@ -25,38 +23,43 @@ export default function Pasien() {
             console.error('Error:', error);
         }
         };
-
-        fetchData();
-    }, []);
     const kolomPasien = [
         {
-          header: 'No',
-          accessorKey: 'id',
+            header: 'No.',
+            accessorKey: 'id',
+            cell: ({row}) => (
+                <div>{row.original.id}.</div>
+            )
         },
         {
-          header: 'Nama',
-          accessorKey: 'nama',
+            header: 'Nama',
+            accessorKey: 'nama',
         },
         {
-          header: 'NIK',
-          accessorKey: 'nik',
+            header: 'NIK',
+            accessorKey: 'nik',
         },
         {
-          header: 'Alamat',
-          accessorKey: 'alamat',
+            header: 'Alamat',
+            accessorKey: 'alamat',
         },
         {
-            header: 'Aksi',
+            accessorKey: 'id',
+            header: () => <div></div>,
             cell: ({row}) => (
                 <td className='flex justify-center'>
-                    <button onclick="route.push('pasien/detail')" className='bg-[#0080CC] text-white rounded px-[14px] py-[3px] font-semibold text-sm mr-2'>Detail</button>
-                    <button onclick="setShowEditModal(!showEditModal)" className='bg-[#FEC107] text-white rounded px-[14px] py-[3px] font-semibold text-sm mr-2'>Edit</button>
+                    <button onClick={() => route.push('pasien/detail')} className='bg-[#0080CC] text-white rounded px-[14px] py-[3px] font-semibold text-sm mr-2'>Detail</button>
+                    <button onClick={() => setShowEditModal(!showEditModal)} className='bg-[#FEC107] text-white rounded px-[14px] py-[3px] font-semibold text-sm mr-2'>Edit</button>
                     <button className='bg-[#FF0000] text-white rounded px-[14px] py-[3px] font-semibold text-sm'>Hapus</button>
                 </td>
             )
         
         }
-      ]
+    ]
+
+    useEffect(() => {
+        fetchData();
+    }, []);
     return (
         <div>
             <Modal 
@@ -165,21 +168,21 @@ export default function Pasien() {
             />
             <div className='bg-[#ECEFF4] flex gap-[32px] min-h-screen'>
                 <Sidebar />
-                <div className='w-full'>
-                    <div className='flex items-center justify-between pr-[78px] pt-[80px] mb-4'>
-                        <h1 className='text-[32px] text-[#353A40] font-semibold'>Pasien</h1>
+                <div className='w-full pb-10 pr-[32px]'>
+                    <div className='flex items-start justify-between  pt-[40px] mb-4'>
+                        <h1 className='text-4xl text-[#353A40] font-bold'>Pasien</h1>
                         <h1>Navigasi / <span className='text-cyan font-medium'>Pasien</span></h1>
                     </div>
-                    <div className='flex items-center justify-end pr-[126px]'>
+                    <div className='flex items-center justify-end '>
                         
-                        <button onClick={() => setShowAddModal(!showAddModal)} className='flex items-center justify-center gap-3 py-[14px] bg-[#0179FF] px-[30px] rounded text-white font-medium'>
-                            <FaCirclePlus className='text-xl' />
-                            <h1>Tambah</h1>
-                        </button>
+                    <button onClick={() => setShowAddModal(!showAddModal)} className='flex items-center justify-center gap-3 py-[14px] bg-[#0179FF] px-[30px] rounded text-white font-medium'>
+                        <FaCirclePlus className='text-xl' />
+                        <h1>Tambah</h1>
+                    </button>
                     </div>
-                    <div className='flex items-center justify-center '>
+                    {/* <div className='flex items-center w-full '> */}
                         <Table data={data} columns={kolomPasien} />
-                    </div>
+                    {/* </div> */}
                 </div>
             </div>
         </div>

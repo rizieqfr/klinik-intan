@@ -7,9 +7,9 @@ export default function Dashboard() {
   return (
     <div className='bg-[#ECEFF4] flex gap-[32px] min-h-screen'>
         <Sidebar />
-        <div className='w-full'>
-            <div className='flex items-center justify-between pr-[78px] py-[80px]'>
-                <h1 className='text-[32px] text-[#353A40] font-semibold'>Dashboard</h1>
+        <div className='w-full pr-[32px]'>
+            <div className='flex items-center justify-between py-[40px]'>
+                <h1 className='text-4xl text-[#353A40] font-bold'>Dashboard</h1>
                 <h1>Navigasi / <span className='text-cyan font-medium'>Dashboard</span></h1>
             </div>
             <div className='grid grid-cols-3 gap-10'>
