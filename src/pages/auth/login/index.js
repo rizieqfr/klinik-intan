@@ -49,7 +49,7 @@ export default function Login() {
                         <div>
                             <Link href={'/auth/register'}>Don&#39;t have an account&#63; <span className='text-cyan font-semibold'>Register&#33;</span></Link>
                         </div>
-                        <button  className='bg-cyan text-white px-[163px] py-[20px] w-full rounded-md font-medium'>Sign in</button>
+                        <button onClick={() => router.push('/dashboard')}  className='bg-cyan text-white px-[163px] py-[20px] w-full rounded-md font-medium'>Sign in</button>
                     </div>
                 </div>
 

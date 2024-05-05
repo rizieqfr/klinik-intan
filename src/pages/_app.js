@@ -8,7 +8,7 @@ export default function App({ Component, pageProps }) {
             position="top-center"
             reverseOrder={true}
         />
-      <Component {...pageProps} />;
+      <Component {...pageProps} />
     </>
   )
 }
