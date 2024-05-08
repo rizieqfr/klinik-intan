@@ -1,8 +1,8 @@
 import { useRouter } from 'next/router'
-import { FaBars, FaBookMedical, FaHandHoldingMedical, FaUserGear } from "react-icons/fa6";
+import { FaBars, FaBookMedical, FaHandHoldingMedical, FaRupiahSign, FaUserDoctor, FaUserGear } from "react-icons/fa6";
 import { FaHome } from "react-icons/fa";
 import React, { useEffect, useState } from 'react'
-import { MdMedicalServices } from "react-icons/md";
+import { MdMedicalServices, MdPayments } from "react-icons/md";
 import { RiAdminFill, RiLogoutBoxFill } from "react-icons/ri";
 import Api from '../pages/api/hello';
 
@@ -43,6 +43,10 @@ export default function Sidebar() {
                 <FaHandHoldingMedical />
                 <h1 className='text-start'>Pasien</h1>
             </button>
+            <button onClick={() => router.push('/dokter')} className={`${router.pathname === '/dokter' && 'bg-[#0179FF]'} hover:bg-[#0179FF] py-[8px] px-[37px] text-white font-semibold w-full flex items-center gap-2`}>
+                <FaUserDoctor  />
+                <h1 className='text-start'>Dokter</h1>
+            </button>
             <button onClick={() => router.push('/rekam-medis')} className={`${router.pathname === '/rekam-medis' && 'bg-[#0179FF]'} hover:bg-[#0179FF] py-[8px] px-[37px] text-white font-semibold w-full flex items-center gap-2`}>
                 <FaBookMedical />
                 <h1 className='text-start'>Rekam Medis</h1>
@@ -51,16 +55,16 @@ export default function Sidebar() {
                 <MdMedicalServices />
                 <h1 className='text-start'>Pelayanan</h1>
             </button>
+            <button onClick={() => router.push('/pembayaran')} className={`${router.pathname === '/pembayaran' && 'bg-[#0179FF]'} hover:bg-[#0179FF] py-[8px] px-[37px] text-white font-semibold w-full flex items-center gap-2`}>
+                <MdPayments   />
+                <h1 className='text-start'>Pembayaran</h1>
+            </button>
             <button onClick={() => router.push('/user-management')} className={`${router.pathname === '/user-management' && 'bg-[#0179FF]'} hover:bg-[#0179FF] py-[8px] px-[37px] text-white font-semibold w-full flex items-center gap-2`}>
                 <FaUserGear />
                 <h1 className='text-start'>User</h1>
             </button>
-            <button onClick={() => router.push('/dokter')} className={`${router.pathname === '/dokter' && 'bg-[#0179FF]'} hover:bg-[#0179FF] py-[8px] px-[37px] text-white font-semibold w-full flex items-center gap-2`}>
-                <FaUserGear />
-                <h1 className='text-start'>Dokter</h1>
-            </button>
         </div>
-        <button onClick={() => router.push('/auth/login')} className='hover:bg-[#0179FF] py-[8px] px-[37px] text-white font-semibold w-full flex items-center gap-2 mt-48 '>
+        <button onClick={() => router.push('/')} className='hover:bg-[#0179FF] py-[8px] px-[37px] text-white font-semibold w-full flex items-center gap-2 mt-48 '>
             <RiLogoutBoxFill />
             <h1 className='text-start'>Log Out</h1>
         </button>

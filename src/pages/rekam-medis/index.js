@@ -14,7 +14,7 @@ export default function RekamMedis() {
     const route = useRouter()
     const kolomRekamMedis = [
         {
-            header: 'No',
+            header: 'No. Booking',
             accessorKey: 'id',
         },
         {

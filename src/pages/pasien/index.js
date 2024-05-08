@@ -27,10 +27,10 @@ export default function Pasien() {
         };
     const kolomPasien = [
         {
-            header: 'No.',
+            header: 'No Rm',
             accessorKey: 'id',
             cell: ({row}) => (
-                <div>{row.original.id}.</div>
+                <div>0000{row.original.id}</div>
             )
         },
         {

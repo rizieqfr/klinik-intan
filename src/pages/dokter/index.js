@@ -227,7 +227,7 @@ export default function Dokter() {
             <Sidebar />
             <div className='w-full pr-[32px]'>
                 <div className='flex items-center justify-between pt-[40px] mb-4'>
-                    <h1 className='text-[32px] text-[#353A40] font-semibold'>Dokter</h1>
+                    <h1 className='text-4xl text-[#353A40] font-bold'>Dokter</h1>
                     <h1>Navigasi / <span className='text-cyan font-medium'>Dokter</span></h1>
                 </div>
                 <div className='flex items-center justify-end mb-4'>

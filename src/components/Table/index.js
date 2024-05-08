@@ -33,7 +33,7 @@ import { TableCell, TableRow } from '../ui/table'
   
     return (
       <div className=''>
-        <div className='flex items-center justify-start w-full gap-3 bg-white py-[10px] rounded-lg my-4'>
+        <div className='flex items-center justify-start w-full gap-3 bg-white py-[10px] rounded-lg my-4 border'>
             <FiSearch className='text-black text-xl ml-5'/>
             <input onChange={e => setFiltering(e.target.value)} value={filtering} type="text" className='outline-none w-full mr-3 text-[14px]' placeholder='Search ...' />
         </div>

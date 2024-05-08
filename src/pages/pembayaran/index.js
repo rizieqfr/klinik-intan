@@ -7,36 +7,57 @@ import React, { useState } from 'react'
 import toast from 'react-hot-toast'
 import { FaCirclePlus } from 'react-icons/fa6'
 
-export default function UserManagement() {
+export default function Pembayaran() {
     const [showAddModal, setShowAddModal] = useState(false)
     const [showEditModal, setShowEditModal] = useState(false)
     const route = useRouter()
     const kolomUser = [
         {
-            header: 'No',
+            header: 'No. Transaksi',
             accessorKey: 'id',
         },
         {
-            header: 'Nama',
-            accessorKey: 'nama',
+            header: 'Nama Pasien',
+            accessorKey: 'namaPasien',
         },
         {
-            header: 'Email',
-            accessorKey: 'email',
+            header: 'Total Pembayaran',
+            accessorKey: 'totalPembayaran',
+            cell: ({row}) => (
+                <div>Rp. {row.original.totalPembayaran ?? '-'}</div>
+            )
         },
         {
-            header: 'Role',
-            accessorKey: 'role',
+            header: 'Status Pembayaran',
+            accessorKey: 'status',
+            cell: ({row}) => (
+                <div>
+                    {row.original.status === 'lunas' ? (
+                        <h1 className='text-green-600 font-semibold'>Lunas</h1>
+                    ) : (
+                        <h1 className='text-red-600 font-semibold'>Belum Lunas</h1>
+                    )}
+                </div>
+            )
         },
         {
             accessorKey: 'id',
             header: () => <div></div>,
             cell: ({row}) => (
-                <td className='flex justify-center'>
-                    <button onClick={() => route.push('pasien/detail')} className='bg-[#0080CC] text-white rounded px-[14px] py-[3px] font-semibold text-sm mr-2'>Detail</button>
-                    <button onClick={() => setShowEditModal(!showEditModal)} className='bg-[#FEC107] text-white rounded px-[14px] py-[3px] font-semibold text-sm mr-2'>Edit</button>
-                    <button className='bg-[#FF0000] text-white rounded px-[14px] py-[3px] font-semibold text-sm'>Hapus</button>
-                </td>
+                <div>
+                    {row.original.status === 'lunas' ? (
+                        <td className='flex justify-center'>
+                            <button onClick={() => setShowEditModal(!showEditModal)} disabled className='bg-blue-300 text-white rounded px-[14px] py-[3px] font-semibold text-sm mr-2'>Edit Status</button>
+                            <button onClick={() => route.push(`pasien/detail/${row.original.id}`)} className='bg-blue-600 text-white rounded px-[14px] py-[3px] font-semibold text-sm mr-2'>Cetak Invoice</button>
+                        </td>
+                    ) : (
+                        <td className='flex justify-center'>
+                            <button onClick={() => setShowEditModal(!showEditModal)} className='bg-blue-600  text-white rounded px-[14px] py-[3px] font-semibold text-sm mr-2'>Edit Status</button>
+                            <button onClick={() => route.push(`pasien/detail/${row.original.id}`)} disabled className='bg-blue-300 text-white rounded px-[14px] py-[3px] font-semibold text-sm mr-2'>Cetak Invoice</button>
+                        </td>
+                    )}
+                </div>
+                
             )
         
         }
@@ -178,8 +199,8 @@ export default function UserManagement() {
             <Sidebar />
             <div className='w-full pr-[32px]'>
                 <div className='flex items-center justify-between pt-[40px] mb-4'>
-                    <h1 className='text-4xl text-[#353A40] font-bold'>User Management</h1>
-                    <h1>Navigasi / <span className='text-cyan font-medium'>User Management</span></h1>
+                    <h1 className='text-4xl text-[#353A40] font-bold'>Pembayaran</h1>
+                    <h1>Navigasi / <span className='text-cyan font-medium'>Pembayaran</span></h1>
                 </div>
                 <div className='flex items-center justify-end mb-4'>
                     <button onClick={() => setShowEditModal(!showEditModal)} className='flex items-center justify-center gap-3 py-[14px] bg-[#0179FF] px-[30px] rounded text-white font-medium'>
