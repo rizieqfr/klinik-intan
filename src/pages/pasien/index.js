@@ -1,8 +1,10 @@
 import Table from '@/components/Table'
 import Modal from '@/components/modal'
 import Sidebar from '@/components/sidebar'
+import { useFormik } from 'formik'
 import { useRouter } from 'next/router'
 import React, { useEffect, useState } from 'react'
+import toast from 'react-hot-toast'
 import { FaCirclePlus } from 'react-icons/fa6'
 import { FiSearch } from 'react-icons/fi'
 
@@ -56,6 +58,51 @@ export default function Pasien() {
         
         }
     ]
+    const formik = useFormik({
+        initialValues:{
+            namaPasien:'',
+            alamatPasien:'',
+            noTelepon:'',
+            nikPasien:'',
+            tanggalLahir:'',
+            pekerjaan:'',
+            jenisKelamin:'',
+        },
+        validate:(values) => {
+            const requiredFields = [
+                "namaPasien",
+                "alamatPasien",
+                "noTelepon",
+                "nikPasien",
+                "tanggalLahir",
+                "pekerjaan",
+                "jenisKelamin"
+            ];
+            const errors = Object.fromEntries(
+                requiredFields
+                .filter(field => !values[field])
+                .map(field => {
+                    const fieldNameWithSpaces = field.replace(/([A-Z])/g, ' $1').trim();
+                    return [field, `${fieldNameWithSpaces.charAt(0).toUpperCase() + fieldNameWithSpaces.slice(1)} wajib diisi`];
+                })
+            );
+            
+            return errors;
+        },
+        onSubmit: (values) => {
+            console.log(values)
+            formik.resetForm()
+            
+            if(showAddModal === true) {
+                setShowAddModal(!showAddModal)
+                toast.success('Sukses Tambah Pasien')
+            }
+            if(showEditModal === true) {
+                setShowEditModal(!showEditModal)
+                toast.success('Sukses Edit Pasien')
+            }
+        }
+    })
 
     useEffect(() => {
         fetchData();
@@ -69,48 +116,47 @@ export default function Pasien() {
                 width={'1000px'}
                 content= {
                     <div className=' w-full space-y-[12px]'>
-                        <div className='flex items-center justify-between w-full text-sm'>
-                            <h1 className='text-[#353A40] font-semibold'>NIK</h1>
-                            <input type="text" className='py-[13px] px-[16px] border rounded w-[85%] outline-none' placeholder='NIK...'/>
-                        </div>
-                        <div className='flex items-center justify-between w-full text-sm'>
-                            <h1 className='text-[#353A40] font-semibold'>Nama</h1>
-                            <input type="text" className='py-[13px] px-[16px] border rounded w-[85%] outline-none' placeholder='Nama...'/>
-                        </div>
-                        <div className='flex items-center justify-between w-full text-sm'>
-                            <h1 className='text-[#353A40] font-semibold'>Jenis Kelamin</h1>
-                            <select className='py-[13px] px-[16px] border rounded w-[85%] outline-none' name="" id="">
-                                <option value="">Pilih Jenis Kelamin...</option>
-                                <option value="Laki-Laki">Laki-Laki</option>
-                                <option value="Perempuan">Perempuan</option>
-                            </select>
-                        </div>
-                        <div className='flex items-center justify-between w-full text-sm'>
-                            <h1 className='text-[#353A40] font-semibold'>Tanggal Lahir</h1>
-                            <input type="date" className='py-[13px] px-[16px] border rounded w-[85%] outline-none' placeholder='Tanggal Lahir...'/>
-                        </div>
-                        <div className='flex items-center justify-between w-full text-sm'>
-                            <h1 className='text-[#353A40] font-semibold'>Telepon</h1>
-                            <input type="number" className='py-[13px] px-[16px] border rounded w-[85%] outline-none' placeholder='Telepon...'/>
-                        </div>
-                        <div className='flex items-center justify-between w-full text-sm'>
-                            <h1 className='text-[#353A40] font-semibold'>Pekerjaan</h1>
-                            <input type="text" className='py-[13px] px-[16px] border rounded w-[85%] outline-none' placeholder='Pekerjaan...'/>
-                        </div>
-                        <div className='flex items-center justify-between w-full text-sm'>
-                            <h1 className='text-[#353A40] font-semibold'>Kartu Kesehatan</h1>
-                            <input type="text" className='py-[13px] px-[16px] border rounded w-[85%] outline-none' placeholder='Kartu Kesehatan...'/>
-                        </div>
-                        <div className='flex items-center justify-between w-full text-sm'>
-                            <h1 className='text-[#353A40] font-semibold'>Nomor Kartu</h1>
-                            <input type="text" className='py-[13px] px-[16px] border rounded w-[85%] outline-none' placeholder='Nomor Kartu...'/>
-                        </div>
+                        <div className='grid grid-cols-12 gap-y-8'>
+                            <div className='grid space-y-2 col-span-2 items-center text-[#353A40] font-semibold'>
+                                <h1>NIK</h1>
+                                <h1>Nama</h1>
+                                <h1>Jenis Kelamin</h1>
+                                <h1>Alamat</h1>
+                                <h1>Tanggal Lahir</h1>
+                                <h1>Telepon</h1>
+                                <h1>Pekerjaan</h1>
+                            </div>
+                            <div className='grid space-y-2 col-span-9'>
+                                <input type="text" className='py-[13px] px-[16px] border rounded w-full outline-none' onChange={formik.handleChange} value={formik.values.nikPasien} name='nikPasien' placeholder='NIK...'/>
+                                {formik.touched.nikPasien && formik.errors.nikPasien && <p className='text-xs font-medium text-red-600 ml-1'>*{formik.errors.nikPasien}</p>}
 
+                                <input type="text" className='py-[13px] px-[16px] border rounded w-full outline-none' onChange={formik.handleChange} value={formik.values.namaPasien} name='namaPasien' placeholder='Nama...'/>
+                                {formik.touched.namaPasien && formik.errors.namaPasien && <p className='text-xs font-medium text-red-600 ml-1'>*{formik.errors.namaPasien}</p>}
+
+                                <select onChange={(val) => formik.setFieldValue('jenisKelamin', val)} defaultValue={formik.values.jenisKelamin} className='py-[13px] px-[16px] border rounded w-full' name="jenisKelamin">
+                                    <option value="">Pilih Jenis Kelamin...</option>
+                                    <option value="Laki-laki">Laki-laki</option>
+                                    <option value="Perempuan">Perempuan</option>
+                                </select>
+                                {formik.touched.jenisKelamin && formik.errors.jenisKelamin && <p className='text-xs font-medium text-red-600 ml-1'>*{formik.errors.jenisKelamin}</p>}
+
+                                <input type="text" className='py-[13px] px-[16px] border rounded w-full outline-none' onChange={formik.handleChange} value={formik.values.alamatPasien} name='alamatPasien' placeholder='Alamat...'/>
+                                {formik.touched.alamatPasien && formik.errors.alamatPasien && <p className='text-xs font-medium text-red-600 ml-1'>*{formik.errors.alamatPasien}</p>}
+
+                                <input type="date" className='py-[13px] px-[16px] border rounded w-full outline-none' onChange={formik.handleChange} value={formik.values.tanggalLahir} name='tanggalLahir' placeholder='Tanggal Lahir...'/>
+                                {formik.touched.tanggalLahir && formik.errors.tanggalLahir && <p className='text-xs font-medium text-red-600 ml-1'>*{formik.errors.tanggalLahir}</p>}
+
+                                <input type="number" className='py-[13px] px-[16px] border rounded w-full outline-none' onChange={formik.handleChange} value={formik.values.noTelepon} name='noTelepon' placeholder='Telepon...'/>
+                                {formik.touched.noTelepon && formik.errors.noTelepon && <p className='text-xs font-medium text-red-600 ml-1'>*{formik.errors.noTelepon}</p>}
+
+                                <input type="text" className='py-[13px] px-[16px] border rounded w-full outline-none' onChange={formik.handleChange} value={formik.values.pekerjaan} name='pekerjaan' placeholder='Pekerjaan...'/>
+                                {formik.touched.pekerjaan && formik.errors.pekerjaan && <p className='text-xs font-medium text-red-600 ml-1'>*{formik.errors.pekerjaan}</p>}
+                            </div>
+                        </div>
                         <div className='flex items-center justify-end gap-3'>
                             <button onClick={() => setShowAddModal(!showAddModal)} className='border-[#0179FF] border text-[#0179FF] font-semibold px-[33px] py-[15px] rounded'>Batal</button>
-                            <button className='bg-[#0179FF] text-white font-semibold px-[33px] py-[15px] rounded'>Tambah</button>
+                            <button onClick={formik.handleSubmit} className='bg-[#0179FF] text-white font-semibold px-[33px] py-[15px] rounded'>Add</button>
                         </div>
-
                     </div>
                     }
             />
@@ -121,48 +167,44 @@ export default function Pasien() {
                 width={'1000px'}
                 content= {
                     <div className=' w-full space-y-[12px]'>
-                        <div className='flex items-center justify-between w-full text-sm'>
-                            <h1 className='text-[#353A40] font-semibold'>NIK</h1>
-                            <input type="text" className='py-[13px] px-[16px] border rounded w-[85%] outline-none' placeholder='NIK...'/>
-                        </div>
-                        <div className='flex items-center justify-between w-full text-sm'>
-                            <h1 className='text-[#353A40] font-semibold'>Nama</h1>
-                            <input type="text" className='py-[13px] px-[16px] border rounded w-[85%] outline-none' placeholder='Nama...'/>
-                        </div>
-                        <div className='flex items-center justify-between w-full text-sm'>
-                            <h1 className='text-[#353A40] font-semibold'>Jenis Kelamin</h1>
-                            <select className='py-[13px] px-[16px] border rounded w-[85%] outline-none' name="" id="">
-                                <option value="">Pilih Jenis Kelamin...</option>
-                                <option value="Laki-Laki">Laki-Laki</option>
-                                <option value="Perempuan">Perempuan</option>
-                            </select>
-                        </div>
-                        <div className='flex items-center justify-between w-full text-sm'>
-                            <h1 className='text-[#353A40] font-semibold'>Tanggal Lahir</h1>
-                            <input type="date" className='py-[13px] px-[16px] border rounded w-[85%] outline-none' placeholder='Tanggal Lahir...'/>
-                        </div>
-                        <div className='flex items-center justify-between w-full text-sm'>
-                            <h1 className='text-[#353A40] font-semibold'>Telepon</h1>
-                            <input type="number" className='py-[13px] px-[16px] border rounded w-[85%] outline-none' placeholder='Telepon...'/>
-                        </div>
-                        <div className='flex items-center justify-between w-full text-sm'>
-                            <h1 className='text-[#353A40] font-semibold'>Pekerjaan</h1>
-                            <input type="text" className='py-[13px] px-[16px] border rounded w-[85%] outline-none' placeholder='Pekerjaan...'/>
-                        </div>
-                        <div className='flex items-center justify-between w-full text-sm'>
-                            <h1 className='text-[#353A40] font-semibold'>Kartu Kesehatan</h1>
-                            <input type="text" className='py-[13px] px-[16px] border rounded w-[85%] outline-none' placeholder='Kartu Kesehatan...'/>
-                        </div>
-                        <div className='flex items-center justify-between w-full text-sm'>
-                            <h1 className='text-[#353A40] font-semibold'>Nomor Kartu</h1>
-                            <input type="text" className='py-[13px] px-[16px] border rounded w-[85%] outline-none' placeholder='Nomor Kartu...'/>
-                        </div>
+                        <div className='grid grid-cols-12 gap-y-8'>
+                            <div className='grid space-y-2 col-span-2 items-center text-[#353A40] font-semibold'>
+                                <h1>NIK</h1>
+                                <h1>Nama</h1>
+                                <h1>Jenis Kelamin</h1>
+                                <h1>Tanggal Lahir</h1>
+                                <h1>Telepon</h1>
+                                <h1>Pekerjaan</h1>
+                            </div>
+                            <div className='grid space-y-2 col-span-9'>
+                                <input type="text" className='py-[13px] px-[16px] border rounded w-full outline-none' onChange={formik.handleChange} value={formik.values.nikPasien} name='nikPasien' placeholder='NIK...'/>
+                                {formik.touched.nikPasien && formik.errors.nikPasien && <p className='text-xs font-medium text-red-600 ml-1'>*{formik.errors.nikPasien}</p>}
 
+                                <input type="text" className='py-[13px] px-[16px] border rounded w-full outline-none' onChange={formik.handleChange} value={formik.values.namaPasien} name='namaPasien' placeholder='Nama...'/>
+                                {formik.touched.namaPasien && formik.errors.namaPasien && <p className='text-xs font-medium text-red-600 ml-1'>*{formik.errors.namaPasien}</p>}
+
+                                <select onChange={(val) => formik.setFieldValue('jenisKelamin', val)} defaultValue={formik.values.jenisKelamin} className='py-[13px] px-[16px] border rounded w-full' name="jenisKelamin">
+                                    <option value="">Pilih Jenis Kelamin...</option>
+                                    <option value="Laki-laki">Laki-laki</option>
+                                    <option value="Perempuan">Perempuan</option>
+                                </select>
+
+                                {formik.touched.jenisKelamin && formik.errors.jenisKelamin && <p className='text-xs font-medium text-red-600 ml-1'>*{formik.errors.jenisKelamin}</p>}
+
+                                <input type="date" className='py-[13px] px-[16px] border rounded w-full outline-none' onChange={formik.handleChange} value={formik.values.tanggalLahir} name='tanggalLahir' placeholder='Tanggal Lahir...'/>
+                                {formik.touched.tanggalLahir && formik.errors.tanggalLahir && <p className='text-xs font-medium text-red-600 ml-1'>*{formik.errors.tanggalLahir}</p>}
+
+                                <input type="number" className='py-[13px] px-[16px] border rounded w-full outline-none' onChange={formik.handleChange} value={formik.values.noTelepon} name='noTelepon' placeholder='Telepon...'/>
+                                {formik.touched.noTelepon && formik.errors.noTelepon && <p className='text-xs font-medium text-red-600 ml-1'>*{formik.errors.noTelepon}</p>}
+
+                                <input type="text" className='py-[13px] px-[16px] border rounded w-full outline-none' onChange={formik.handleChange} value={formik.values.pekerjaan} name='pekerjaan' placeholder='Pekerjaan...'/>
+                                {formik.touched.pekerjaan && formik.errors.pekerjaan && <p className='text-xs font-medium text-red-600 ml-1'>*{formik.errors.pekerjaan}</p>}
+                            </div>
+                        </div>
                         <div className='flex items-center justify-end gap-3'>
                             <button onClick={() => setShowEditModal(!showEditModal)} className='border-[#0179FF] border text-[#0179FF] font-semibold px-[33px] py-[15px] rounded'>Batal</button>
-                            <button className='bg-[#0179FF] text-white font-semibold px-[33px] py-[15px] rounded'>Edit</button>
+                            <button onClick={formik.handleSubmit} className='bg-[#0179FF] text-white font-semibold px-[33px] py-[15px] rounded'>Edit</button>
                         </div>
-
                     </div>
                     }
             />

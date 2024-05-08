@@ -55,6 +55,10 @@ export default function Sidebar() {
                 <FaUserGear />
                 <h1 className='text-start'>User</h1>
             </button>
+            <button onClick={() => router.push('/dokter')} className={`${router.pathname === '/dokter' && 'bg-[#0179FF]'} hover:bg-[#0179FF] py-[8px] px-[37px] text-white font-semibold w-full flex items-center gap-2`}>
+                <FaUserGear />
+                <h1 className='text-start'>Dokter</h1>
+            </button>
         </div>
         <button onClick={() => router.push('/auth/login')} className='hover:bg-[#0179FF] py-[8px] px-[37px] text-white font-semibold w-full flex items-center gap-2 mt-48 '>
             <RiLogoutBoxFill />

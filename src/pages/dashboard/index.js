@@ -17,51 +17,63 @@ export default function Dashboard() {
                     <div className='px-[24px] py-[28px] bg-[#17A2B7] text-white rounded-t-lg'>
                         <div className='flex items-center justify-between'>
                             <div>
-                                <h1 className='text-[24px] font-semibold'>02</h1>
-                                <h1 className='text-[16px]'>Total Pasien</h1>
+                                <h1 className='text-4xl font-bold mb-2'>02</h1>
+                                <h1 className='text-xl font-semibold'>Total Pasien</h1>
                             </div>
                             <FaHandHoldingMedical className='text-4xl' />
                         </div>
                         
                     </div>
-                    <button className='w-full py-[8px] px-[90px] bg-white text-[#353A40] font-semibold text-[12px] rounded-b-lg'>More info</button>
+                    <button className='w-full py-[8px] px-[90px] bg-white text-[#353A40] font-bold text-sm rounded-b-lg'>More info</button>
                 </div>
                 <div className='w-[348px] h-[143px] '>
                     <div className='px-[24px] py-[28px] bg-[#27A844] text-white rounded-t-lg'>
                         <div className='flex items-center justify-between'>
                             <div>
-                                <h1 className='text-[24px] font-semibold'>02</h1>
-                                <h1 className='text-[16px]'>Total Rekam Medis</h1>
+                                <h1 className='text-4xl font-bold mb-2'>02</h1>
+                                <h1 className='text-xl font-semibold'>Total Rekam Medis</h1>
                             </div>
                             <FaBookMedical className='text-4xl' />
                         </div>
 
                     </div>
-                    <button className='w-full py-[8px] px-[90px] bg-white text-[#353A40] font-semibold text-[12px] rounded-b-lg'>More info</button>
+                    <button className='w-full py-[8px] px-[90px] bg-white text-[#353A40] font-bold text-sm rounded-b-lg'>More info</button>
                 </div>
                 <div className='w-[348px] h-[143px] '>
                     <div className='px-[24px] py-[28px] bg-[#DC3546] text-white rounded-t-lg'>
                         <div className='flex items-center justify-between'>
                             <div>
-                                <h1 className='text-[24px] font-semibold'>02</h1>
-                                <h1 className='text-[16px]'>Total Pelayanan</h1>
+                                <h1 className='text-4xl font-bold mb-2'>02</h1>
+                                <h1 className='text-xl font-semibold'>Total Pelayanan</h1>
                             </div>
                             <MdMedicalServices className='text-4xl' />
                         </div>
                     </div>
-                    <button className='w-full py-[8px] px-[90px] bg-white text-[#353A40] font-semibold text-[12px] rounded-b-lg'>More info</button>
+                    <button className='w-full py-[8px] px-[90px] bg-white text-[#353A40] font-bold text-sm rounded-b-lg'>More info</button>
                 </div>
                 <div className='w-[348px] h-[143px] '>
                     <div className='px-[24px] py-[28px] bg-[#DC3546] text-white rounded-t-lg'>
                         <div className='flex items-center justify-between'>
                             <div>
-                                <h1 className='text-[24px] font-semibold'>02</h1>
-                                <h1 className='text-[16px]'>Total User</h1>
+                                <h1 className='text-4xl font-bold mb-2'>02</h1>
+                                <h1 className='text-xl font-semibold'>Total User</h1>
                             </div>
                             <FaUserGear className='text-4xl' />
                         </div>
                     </div>
-                    <button className='w-full py-[8px] px-[90px] bg-white text-[#353A40] font-semibold text-[12px] rounded-b-lg'>More info</button>
+                    <button className='w-full py-[8px] px-[90px] bg-white text-[#353A40] font-bold text-sm rounded-b-lg'>More info</button>
+                </div>
+                <div className='w-[348px] h-[143px] '>
+                    <div className='px-[24px] py-[28px] bg-[#17A2B7] text-white rounded-t-lg'>
+                        <div className='flex items-center justify-between'>
+                            <div>
+                                <h1 className='text-4xl font-bold mb-2'>02</h1>
+                                <h1 className='text-xl font-semibold'>Dokter Management</h1>
+                            </div>
+                            <FaUserGear className='text-4xl' />
+                        </div>
+                    </div>
+                    <button className='w-full py-[8px] px-[90px] bg-white text-[#353A40] font-bold text-sm rounded-b-lg'>More info</button>
                 </div>
                 
             </div>

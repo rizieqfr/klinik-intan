@@ -9,6 +9,7 @@ import {
   import { useState } from 'react'
 import { FiSearch } from 'react-icons/fi'
 import DataTablePagination from './DataTablePagination'
+import { TableCell, TableRow } from '../ui/table'
   
   export default function Table({ data, columns }) {
   
@@ -34,7 +35,7 @@ import DataTablePagination from './DataTablePagination'
       <div className=''>
         <div className='flex items-center justify-start w-full gap-3 bg-white py-[10px] rounded-lg my-4'>
             <FiSearch className='text-black text-xl ml-5'/>
-            <input onChange={e => setFiltering(e.target.value)} value={filtering} type="text" className='outline-none w-full mr-3 text-[14px]' placeholder='Search Pasien...' />
+            <input onChange={e => setFiltering(e.target.value)} value={filtering} type="text" className='outline-none w-full mr-3 text-[14px]' placeholder='Search ...' />
         </div>
         <table className='w-full mb-3'>
           <thead className=''>
@@ -61,15 +62,23 @@ import DataTablePagination from './DataTablePagination'
           </thead>
   
           <tbody>
-            {table.getRowModel().rows.map(row => (
-              <tr key={row.id} className=''>
-                {row.getVisibleCells().map(cell => (
-                  <td key={cell.id} className='py-2  border-b  border-slate-600'>
-                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                  </td>
-                ))}
-              </tr>
-            ))}
+            {table.getRowModel().rows?.length ? (
+              table.getRowModel().rows.map(row => (
+                <tr key={row.id} className=''>
+                  {row.getVisibleCells().map(cell => (
+                    <td key={cell.id} className='py-2  border-b  border-slate-600'>
+                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                    </td>
+                  ))}
+                </tr>
+              ))
+            ) : (
+              <TableRow>
+                <TableCell colSpan={columns.length} className="h-24 text-center text-black">
+                  Tidak ada hasil
+                </TableCell>
+              </TableRow>
+            )}
           </tbody>
         </table>
         <DataTablePagination table={table} />
