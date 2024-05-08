@@ -31,7 +31,7 @@ export default function PasienLama() {
                 <div className='py-20 text-md w-1/2 space-y-4'>
                   <h1 className="text-4xl font-semibold mb-10">Pendaftaran Online (Pasien Lama)</h1>
                   <p>Jika anda pasien lama atau pernah berobat sebelumnya, silahkan menggunakan nomor rekam medis dan NIK(nomor KTP) anda untuk login.</p>
-                  <p c>Jika Anda pasien baru dan belum pernah periksa sebelumnya, silahkan tekan tombol "home" untuk melakukan pendaftaran online di menu utama portal  ini.</p>
+                  <p c>Jika Anda pasien baru dan belum pernah periksa sebelumnya, silahkan tekan tombol &quot;home&quot; untuk melakukan pendaftaran online di menu utama portal  ini.</p>
                   <div className='space-y-3'>
                     <Input onChange={formik.handleChange} name={'nomorRm'} placeholder={'Nomor Rekam Medis'} type={'number'} />
                     <Input onChange={formik.handleChange} name={'nik'} placeholder={'NIK'} type={'number'} />
