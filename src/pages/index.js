@@ -1,9 +1,10 @@
-import Image from "next/image";
 import { Inter } from "next/font/google";
-import Login from "./auth/login";
 import Input from "@/components/input";
 import { useFormik } from "formik";
 import { useRouter } from "next/router";
+import axios from "axios";
+import toast from "react-hot-toast";
+import apiService from "@/utils/apiService";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -11,19 +12,34 @@ export default function Home() {
   const router = useRouter()
   const formik = useFormik({
     initialValues : {
-      'name': '',
-      'alamat': '',
-      'telepon': '',
-      'nik': '',
-      'tanggalLahir': '',
-      'alamat': '',
-      'pekerjaan': '',
+      fullname: '',
+      gender: '',
+      phone: '',
+      nik: '',
+      date_birth: '',
+      address: '',
+      work: '',
     },
-    onSubmit: (values) => {
-      console.log('data yang terisi', values)
+    onSubmit: async (values) => {
+      return toast.promise(
+        apiService.request({
+          method: 'POST',
+          url: 'register-patient',
+          data: values
+        }),
+        {
+          loading: 'Sedang melakukan pendaftaran...',
+          success: () => toast.success('Berhasil Register'),
+          error: (error) => {
+            console.error(values, 'dataTerkirim');
+            console.error(error);
+            return error.response?.data?.message || 'Terjadi kesalahan saat melakukan pendaftaran';
+          }
+        }
+      );
     }
-
-  })
+  });
+  
   return (
     <>
       <section className="bg-[#00A9AE] w-full px-[80px] py-[25px]">
@@ -41,19 +57,19 @@ export default function Home() {
           <div className="py-10">
             <h1 className="text-4xl font-semibold mb-10">Pendaftaran Online Pasien Baru</h1>
             <div className="space-y-3">
-              <Input name={'name'} onChange={formik.handleChange} placeholder={'Nama'}/>
-              <Input name={'alamat'} onChange={formik.handleChange} placeholder={'Alamat'}/>
+              <Input name={'fullname'} onChange={formik.handleChange} placeholder={'Nama'}/>
               <div className="flex items-center gap-10 w-full">
                 <div className="w-full">
-                  <Input name={'telepon'} onChange={formik.handleChange} placeholder={'Nomor Hp / Telepon'}/>
+                  <Input type={'text'} name={'phone'} onChange={formik.handleChange} placeholder={'Nomor Hp / Telepon'}/>
                 </div>
                 <div className="w-full">
                   <Input type={'number'} name={'nik'} onChange={formik.handleChange} placeholder={'NIK'}/>
                 </div>
               </div>
-              <Input type={'date'} name={'tanggalLahir'} onChange={formik.handleChange} placeholder={'Tanggal Lahir'}/>
-              <Input  name={'alamat'} onChange={formik.handleChange} placeholder={'Alamat'}/>
-              <Input  name={'pekerjaan'} onChange={formik.handleChange} placeholder={'Pekerjaan'}/>
+              <Input type={'text'} name={'gender'} onChange={formik.handleChange} placeholder={'Jenis Kelamin'}/>
+              <Input type={'date'} name={'date_birth'} onChange={formik.handleChange} placeholder={'Tanggal Lahir'}/>
+              <Input  name={'address'} onChange={formik.handleChange} placeholder={'Alamat'}/>
+              <Input  name={'work'} onChange={formik.handleChange} placeholder={'Pekerjaan'}/>
             </div>
             <div className="flex items-center justify-center mt-6">
               <button onClick={formik.handleSubmit} className="px-[40px] py-[20px] bg-[#0179FF] hover:bg-blue-700 text-white rounded-md shadow-md font-semibold">Daftar Sekarang</button>

@@ -34,7 +34,7 @@ export default function Register() {
     return (
         <div>
             <div className='min-h-screen'>
-                <div className='mx-[299px] my-[120px] bg-white rounded-lg px-[43px] py-[200px] shadow '>
+                <div className='mx-[299px] my-[30px] bg-white border rounded-lg px-[43px] py-[100px] shadow  '>
                     <h1 className='text-[46px] text-center mb-[24px] font-bold'>Intan Husada Klinik</h1>
                     <h2 className='text-center mb-[42px] text-[#353A4099]'>Register to create new Account</h2>
                         <div className='flex items-center justify-center'>

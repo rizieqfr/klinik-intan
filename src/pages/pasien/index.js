@@ -1,41 +1,35 @@
 import Table from '@/components/Table'
 import Modal from '@/components/modal'
 import Sidebar from '@/components/sidebar'
+import ClientRequest from '@/utils/clientApiService'
+import isEmpty from '@/utils/isEmpty'
+import routeGuard from '@/utils/routeGuard'
+import { withSession } from '@/utils/sessionWrapper'
 import { useFormik } from 'formik'
 import { useRouter } from 'next/router'
 import React, { useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
 import { FaCirclePlus } from 'react-icons/fa6'
-import { FiSearch } from 'react-icons/fi'
 
-export default function Pasien() {
+
+
+export default function Pasien({accessToken}) {
     const route = useRouter()
     const [showAddModal, setShowAddModal] = useState(false)
     const [showEditModal, setShowEditModal] = useState(false)
+    const [errorMessage, setErrorMessage] = useState('')
     const [data, setData] = useState([]);
-    const fetchData = async () => {
-        try {
-            const response = await fetch('https://662d2f180547cdcde9e029ab.mockapi.io/monitoring');
-            if (!response.ok) {
-            throw new Error('Failed to fetch data');
-            }
-            const jsonData = await response.json();
-            setData(jsonData);
-        } catch (error) {
-            console.error('Error:', error);
-        }
-        };
     const kolomPasien = [
         {
             header: 'No Rm',
-            accessorKey: 'id',
+            accessorKey: 'no_rm',
             cell: ({row}) => (
-                <div>0000{row.original.id}</div>
+                <div>{row.original.no_rm}</div>
             )
         },
         {
             header: 'Nama',
-            accessorKey: 'nama',
+            accessorKey: 'fullname',
         },
         {
             header: 'NIK',
@@ -43,14 +37,14 @@ export default function Pasien() {
         },
         {
             header: 'Alamat',
-            accessorKey: 'alamat',
+            accessorKey: 'address',
         },
         {
             accessorKey: 'id',
             header: () => <div></div>,
             cell: ({row}) => (
                 <td className='flex justify-center'>
-                    <button onClick={() => route.push('pasien/detail')} className='bg-[#0080CC] text-white rounded px-[14px] py-[3px] font-semibold text-sm mr-2'>Detail</button>
+                    <button onClick={() => route.push(`pasien/detail/${row.original.id}`)} className='bg-[#0080CC] text-white rounded px-[14px] py-[3px] font-semibold text-sm mr-2'>Detail</button>
                     <button onClick={() => setShowEditModal(!showEditModal)} className='bg-[#FEC107] text-white rounded px-[14px] py-[3px] font-semibold text-sm mr-2'>Edit</button>
                     <button className='bg-[#FF0000] text-white rounded px-[14px] py-[3px] font-semibold text-sm'>Hapus</button>
                 </td>
@@ -60,23 +54,23 @@ export default function Pasien() {
     ]
     const formik = useFormik({
         initialValues:{
-            namaPasien:'',
-            alamatPasien:'',
-            noTelepon:'',
-            nikPasien:'',
-            tanggalLahir:'',
-            pekerjaan:'',
-            jenisKelamin:'',
+            nik:'',
+            fullname:'',
+            date_birth: '',
+            gender: '',
+            address:'',
+            work:'',
+            phone:'',
         },
         validate:(values) => {
             const requiredFields = [
-                "namaPasien",
-                "alamatPasien",
-                "noTelepon",
-                "nikPasien",
-                "tanggalLahir",
-                "pekerjaan",
-                "jenisKelamin"
+                'nik',
+                'fullname',
+                'date_birth',
+                'gender',
+                'address',
+                'work',
+                'phone',
             ];
             const errors = Object.fromEntries(
                 requiredFields
@@ -89,23 +83,58 @@ export default function Pasien() {
             
             return errors;
         },
-        onSubmit: (values) => {
-            console.log(values)
-            formik.resetForm()
-            
-            if(showAddModal === true) {
-                setShowAddModal(!showAddModal)
-                toast.success('Sukses Tambah Pasien')
-            }
-            if(showEditModal === true) {
-                setShowEditModal(!showEditModal)
-                toast.success('Sukses Edit Pasien')
+        onSubmit: async (values) => {
+            try {
+                toast.promise(
+                ClientRequest.CreatePasien(accessToken, values).then((res) => {
+
+                return res;
+                }), {
+                loading: 'Processing...',
+                success: (res) => {
+                    formik.resetForm();
+                    if (showAddModal === true) {
+                        setShowAddModal(!showAddModal);
+                    }
+                    if (showEditModal === true) {
+                        setShowEditModal(!showEditModal);
+                }
+                    return `${res.data.message}`;
+                },
+                error: (error) => {
+                    console.log(values, 'dataTerkirim');
+                    console.error(error);
+                    return `${error.response.data.message}`;
+                }
+                }
+            );
+            } catch (error) {
+                console.error('Error during adding/editing pasien:', error);
+                toast.error('Terjadi kesalahan saat menambah/mengedit pasien.');
             }
         }
     })
 
+    const getPasien = async () => {
+        try {
+            const res = await ClientRequest.GetPasien(accessToken);
+            console.log(res, 'response pasien');
+            setData(res.data.data)
+        } catch (error) {
+            console.log(error);
+        }
+    };
+
+    const openModalEdit = async (id) => {
+        try {
+            const res = await ClientRequest.GetPasienById(accessToken, id)
+        } catch (error) {
+            
+        }
+    }
+
     useEffect(() => {
-        fetchData();
+        getPasien();
     }, []);
     return (
         <div>
@@ -127,30 +156,30 @@ export default function Pasien() {
                                 <h1>Pekerjaan</h1>
                             </div>
                             <div className='grid space-y-2 col-span-9'>
-                                <input type="text" className='py-[13px] px-[16px] border rounded w-full outline-none' onChange={formik.handleChange} value={formik.values.nikPasien} name='nikPasien' placeholder='NIK...'/>
-                                {formik.touched.nikPasien && formik.errors.nikPasien && <p className='text-xs font-medium text-red-600 ml-1'>*{formik.errors.nikPasien}</p>}
+                                <input type="number" className='py-[13px] px-[16px] border rounded w-full outline-none' onChange={formik.handleChange} value={formik.values.nik} name='nik' placeholder='NIK...'/>
+                                {formik.touched.nik && formik.errors.nik && <p className='text-xs font-medium text-red-600 ml-1'>*{formik.errors.nik}</p>}
 
-                                <input type="text" className='py-[13px] px-[16px] border rounded w-full outline-none' onChange={formik.handleChange} value={formik.values.namaPasien} name='namaPasien' placeholder='Nama...'/>
-                                {formik.touched.namaPasien && formik.errors.namaPasien && <p className='text-xs font-medium text-red-600 ml-1'>*{formik.errors.namaPasien}</p>}
+                                <input type="text" className='py-[13px] px-[16px] border rounded w-full outline-none' onChange={formik.handleChange} value={formik.values.fullname} name='fullname' placeholder='Nama...'/>
+                                {formik.touched.fullname && formik.errors.fullname && <p className='text-xs font-medium text-red-600 ml-1'>*{formik.errors.fullname}</p>}
 
-                                <select onChange={(val) => formik.setFieldValue('jenisKelamin', val)} defaultValue={formik.values.jenisKelamin} className='py-[13px] px-[16px] border rounded w-full' name="jenisKelamin">
+                                <select onChange={formik.handleChange} defaultValue={formik.values.gender} className='py-[13px] px-[16px] border rounded w-full' name="gender">
                                     <option value="">Pilih Jenis Kelamin...</option>
                                     <option value="Laki-laki">Laki-laki</option>
                                     <option value="Perempuan">Perempuan</option>
                                 </select>
-                                {formik.touched.jenisKelamin && formik.errors.jenisKelamin && <p className='text-xs font-medium text-red-600 ml-1'>*{formik.errors.jenisKelamin}</p>}
+                                {formik.touched.gender && formik.errors.gender && <p className='text-xs font-medium text-red-600 ml-1'>*{formik.errors.gender}</p>}
 
-                                <input type="text" className='py-[13px] px-[16px] border rounded w-full outline-none' onChange={formik.handleChange} value={formik.values.alamatPasien} name='alamatPasien' placeholder='Alamat...'/>
-                                {formik.touched.alamatPasien && formik.errors.alamatPasien && <p className='text-xs font-medium text-red-600 ml-1'>*{formik.errors.alamatPasien}</p>}
+                                <input type="text" className='py-[13px] px-[16px] border rounded w-full outline-none' onChange={formik.handleChange} value={formik.values.alamatPasien} name='address' placeholder='Alamat...'/>
+                                {formik.touched.address && formik.errors.address && <p className='text-xs font-medium text-red-600 ml-1'>*{formik.errors.address}</p>}
 
-                                <input type="date" className='py-[13px] px-[16px] border rounded w-full outline-none' onChange={formik.handleChange} value={formik.values.tanggalLahir} name='tanggalLahir' placeholder='Tanggal Lahir...'/>
-                                {formik.touched.tanggalLahir && formik.errors.tanggalLahir && <p className='text-xs font-medium text-red-600 ml-1'>*{formik.errors.tanggalLahir}</p>}
+                                <input type="date" className='py-[13px] px-[16px] border rounded w-full outline-none' onChange={formik.handleChange} value={formik.values.date_birth} name='date_birth' placeholder='Tanggal Lahir...'/>
+                                {formik.touched.date_birth && formik.errors.date_birth && <p className='text-xs font-medium text-red-600 ml-1'>*{formik.errors.date_birth}</p>}
 
-                                <input type="number" className='py-[13px] px-[16px] border rounded w-full outline-none' onChange={formik.handleChange} value={formik.values.noTelepon} name='noTelepon' placeholder='Telepon...'/>
-                                {formik.touched.noTelepon && formik.errors.noTelepon && <p className='text-xs font-medium text-red-600 ml-1'>*{formik.errors.noTelepon}</p>}
+                                <input type="number" className='py-[13px] px-[16px] border rounded w-full outline-none' onChange={formik.handleChange} value={formik.values.phone} name='phone' placeholder='Telepon...'/>
+                                {formik.touched.phone && formik.errors.phone && <p className='text-xs font-medium text-red-600 ml-1'>*{formik.errors.phone}</p>}
 
-                                <input type="text" className='py-[13px] px-[16px] border rounded w-full outline-none' onChange={formik.handleChange} value={formik.values.pekerjaan} name='pekerjaan' placeholder='Pekerjaan...'/>
-                                {formik.touched.pekerjaan && formik.errors.pekerjaan && <p className='text-xs font-medium text-red-600 ml-1'>*{formik.errors.pekerjaan}</p>}
+                                <input type="text" className='py-[13px] px-[16px] border rounded w-full outline-none' onChange={formik.handleChange} value={formik.values.work} name='work' placeholder='Pekerjaan...'/>
+                                {formik.touched.work && formik.errors.work && <p className='text-xs font-medium text-red-600 ml-1'>*{formik.errors.work}</p>}
                             </div>
                         </div>
                         <div className='flex items-center justify-end gap-3'>
@@ -172,33 +201,36 @@ export default function Pasien() {
                                 <h1>NIK</h1>
                                 <h1>Nama</h1>
                                 <h1>Jenis Kelamin</h1>
+                                <h1>Alamat</h1>
                                 <h1>Tanggal Lahir</h1>
                                 <h1>Telepon</h1>
                                 <h1>Pekerjaan</h1>
                             </div>
                             <div className='grid space-y-2 col-span-9'>
-                                <input type="text" className='py-[13px] px-[16px] border rounded w-full outline-none' onChange={formik.handleChange} value={formik.values.nikPasien} name='nikPasien' placeholder='NIK...'/>
-                                {formik.touched.nikPasien && formik.errors.nikPasien && <p className='text-xs font-medium text-red-600 ml-1'>*{formik.errors.nikPasien}</p>}
+                                <input type="number" className='py-[13px] px-[16px] border rounded w-full outline-none' onChange={formik.handleChange} value={formik.values.nik} name='nik' placeholder='NIK...'/>
+                                {formik.touched.nik && formik.errors.nik && <p className='text-xs font-medium text-red-600 ml-1'>*{formik.errors.nik}</p>}
 
-                                <input type="text" className='py-[13px] px-[16px] border rounded w-full outline-none' onChange={formik.handleChange} value={formik.values.namaPasien} name='namaPasien' placeholder='Nama...'/>
-                                {formik.touched.namaPasien && formik.errors.namaPasien && <p className='text-xs font-medium text-red-600 ml-1'>*{formik.errors.namaPasien}</p>}
+                                <input type="text" className='py-[13px] px-[16px] border rounded w-full outline-none' onChange={formik.handleChange} value={formik.values.fullname} name='fullname' placeholder='Nama...'/>
+                                {formik.touched.fullname && formik.errors.fullname && <p className='text-xs font-medium text-red-600 ml-1'>*{formik.errors.fullname}</p>}
 
-                                <select onChange={(val) => formik.setFieldValue('jenisKelamin', val)} defaultValue={formik.values.jenisKelamin} className='py-[13px] px-[16px] border rounded w-full' name="jenisKelamin">
+                                <select onChange={formik.handleChange} defaultValue={formik.values.gender} className='py-[13px] px-[16px] border rounded w-full' name="gender">
                                     <option value="">Pilih Jenis Kelamin...</option>
                                     <option value="Laki-laki">Laki-laki</option>
                                     <option value="Perempuan">Perempuan</option>
                                 </select>
+                                {formik.touched.gender && formik.errors.gender && <p className='text-xs font-medium text-red-600 ml-1'>*{formik.errors.gender}</p>}
 
-                                {formik.touched.jenisKelamin && formik.errors.jenisKelamin && <p className='text-xs font-medium text-red-600 ml-1'>*{formik.errors.jenisKelamin}</p>}
+                                <input type="text" className='py-[13px] px-[16px] border rounded w-full outline-none' onChange={formik.handleChange} value={formik.values.alamatPasien} name='address' placeholder='Alamat...'/>
+                                {formik.touched.address && formik.errors.address && <p className='text-xs font-medium text-red-600 ml-1'>*{formik.errors.address}</p>}
 
-                                <input type="date" className='py-[13px] px-[16px] border rounded w-full outline-none' onChange={formik.handleChange} value={formik.values.tanggalLahir} name='tanggalLahir' placeholder='Tanggal Lahir...'/>
-                                {formik.touched.tanggalLahir && formik.errors.tanggalLahir && <p className='text-xs font-medium text-red-600 ml-1'>*{formik.errors.tanggalLahir}</p>}
+                                <input type="date" className='py-[13px] px-[16px] border rounded w-full outline-none' onChange={formik.handleChange} value={formik.values.date_birth} name='date_birth' placeholder='Tanggal Lahir...'/>
+                                {formik.touched.date_birth && formik.errors.date_birth && <p className='text-xs font-medium text-red-600 ml-1'>*{formik.errors.date_birth}</p>}
 
-                                <input type="number" className='py-[13px] px-[16px] border rounded w-full outline-none' onChange={formik.handleChange} value={formik.values.noTelepon} name='noTelepon' placeholder='Telepon...'/>
-                                {formik.touched.noTelepon && formik.errors.noTelepon && <p className='text-xs font-medium text-red-600 ml-1'>*{formik.errors.noTelepon}</p>}
+                                <input type="number" className='py-[13px] px-[16px] border rounded w-full outline-none' onChange={formik.handleChange} value={formik.values.phone} name='phone' placeholder='Telepon...'/>
+                                {formik.touched.phone && formik.errors.phone && <p className='text-xs font-medium text-red-600 ml-1'>*{formik.errors.phone}</p>}
 
-                                <input type="text" className='py-[13px] px-[16px] border rounded w-full outline-none' onChange={formik.handleChange} value={formik.values.pekerjaan} name='pekerjaan' placeholder='Pekerjaan...'/>
-                                {formik.touched.pekerjaan && formik.errors.pekerjaan && <p className='text-xs font-medium text-red-600 ml-1'>*{formik.errors.pekerjaan}</p>}
+                                <input type="text" className='py-[13px] px-[16px] border rounded w-full outline-none' onChange={formik.handleChange} value={formik.values.work} name='work' placeholder='Pekerjaan...'/>
+                                {formik.touched.work && formik.errors.work && <p className='text-xs font-medium text-red-600 ml-1'>*{formik.errors.work}</p>}
                             </div>
                         </div>
                         <div className='flex items-center justify-end gap-3'>
@@ -230,3 +262,12 @@ export default function Pasien() {
         </div>
     )
 }
+
+export const getServerSideProps = withSession(async ({ req }) => {
+	const accessToken = req.session?.auth?.access_token
+	const isLoggedIn = !!accessToken
+	const validator = [isLoggedIn]
+	return routeGuard(validator, '/auth/login', {
+		props: {accessToken}
+	})
+})

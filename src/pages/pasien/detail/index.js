@@ -60,3 +60,11 @@ export default function DetailPasien() {
     </div>
   )
 }
+export const getServerSideProps = withSession(async ({ req }) => {
+	const accessToken = req.session?.auth?.access_token
+	const isLoggedIn = !!accessToken
+	const validator = [isLoggedIn]
+	return routeGuard(validator, '/auth/login', {
+		props: {}
+	})
+})

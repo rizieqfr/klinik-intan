@@ -5,6 +5,8 @@ import React, { useEffect, useState } from 'react'
 import { MdMedicalServices, MdPayments } from "react-icons/md";
 import { RiAdminFill, RiLogoutBoxFill } from "react-icons/ri";
 import Api from '../pages/api/hello';
+import toast from 'react-hot-toast';
+import apiService from '@/utils/apiService';
 
 export default function Sidebar() {
     const router = useRouter()
@@ -26,6 +28,29 @@ export default function Sidebar() {
     // useEffect(() => {
     //     fetch()
     // }, [])
+
+
+    const handleLogout = async () => {
+        try {
+            toast.promise(
+                apiService.request({ method: 'POST', url: '/api/logout' }),
+                {
+                    loading: 'Logging Out...',
+                    success: (res) => {
+                        toast.success(res.data.message, { duration: 4000 });
+                        router.replace('/auth/login');
+                    },
+                    error: (error) => {
+                        toast.error('Failed to logout');
+                        console.error('Failed to logout:', error);
+                    }
+                }
+            );
+        } catch (error) {
+            toast.error('Failed to logout');
+            console.error('Failed to logout:', error);
+        }
+    };
   return (
     <div className='bg-[#353A40] text-white w-[288px] py-[30px]'>
         <div className='flex items-center justify-around px-[24px] text-[14px] mb-[50px] border-b pb-4'>

@@ -1,4 +1,7 @@
 import Sidebar from '@/components/sidebar'
+import isEmpty from '@/utils/isEmpty'
+import routeGuard from '@/utils/routeGuard'
+import { withSession } from '@/utils/sessionWrapper'
 import React from 'react'
 import { FaBookMedical, FaHandHoldingMedical, FaUserGear } from 'react-icons/fa6'
 import { MdMedicalServices } from 'react-icons/md'
@@ -81,3 +84,12 @@ export default function Dashboard() {
     </div>
   )
 }
+
+export const getServerSideProps = withSession(async ({ req }) => {
+	const accessToken = req.session?.auth?.access_token
+	const isLoggedIn = !!accessToken
+	const validator = [isLoggedIn]
+	return routeGuard(validator, '/auth/login', {
+		props: {}
+	})
+})
