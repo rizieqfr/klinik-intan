@@ -44,7 +44,68 @@ class ClientRequest {
             }
         })
     }
-    // Pasien
+    // Role
+    static GetRole(token) {
+        let path = `role`;
+        return request(`${this.urlAPI()}${path}`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        })
+    }
+
+    // User Management
+    static GetUserManagement(token) {
+        let path = `user`;
+        return request(`${this.urlAPI()}${path}`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        })
+    }
+    static GetUserManagementById(token, id) {
+        let path = `user/${id}`;
+        return request(`${this.urlAPI()}${path}`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        })
+    }
+    static CreateUserManagement(token, data) {
+        let path = `user-management`;
+        return request(`${this.urlAPI()}${path}`, {
+            method: 'POST',
+            data,
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        })
+    }
+    static UpdateUserManagement(token, data, id) {
+        let path = `user-management/${id}`;
+        return request(`${this.urlAPI()}${path}`, {
+            method: 'PUT',
+            data,
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        })
+    }
+    
+    static DeleteUserManagement(token, id) {
+        let path = `user/${id}`;
+        return request(`${this.urlAPI()}${path}`, {
+            method: 'DELETE',
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        })
+    }
+
+    //Pasien
     static GetPasien(token) {
         let path = `patient`;
         return request(`${this.urlAPI()}${path}`, {

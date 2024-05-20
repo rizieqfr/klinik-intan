@@ -101,11 +101,9 @@ export default function Pasien({accessToken}) {
                             formik.resetForm();
                             setShowAddModal(!showAddModal);
                             getPasien();
-                            console.log(res, 'res sukse')
                             return `${res.data.message}`
                         } ,
                         error: (error) => {
-                            console.log(error, 'res error')
                             return `${error.response.data.message}`
                         },
                     }
@@ -122,11 +120,9 @@ export default function Pasien({accessToken}) {
                         formik.resetForm();
                         setShowEditModal(!showEditModal);
                         getPasien();
-                        console.log(res, 'res sukses')
                         return `${res.data.message}`
                     } ,
                     error: (error) => {
-                        console.log(error, 'res error')
                         return `${error.response.data.message}`
                     },
                 }
