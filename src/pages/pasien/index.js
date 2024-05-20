@@ -1,8 +1,8 @@
+import ModalDelete from '@/components/ModalDelete'
 import Table from '@/components/Table'
 import Modal from '@/components/modal'
 import Sidebar from '@/components/sidebar'
 import ClientRequest from '@/utils/clientApiService'
-import isEmpty from '@/utils/isEmpty'
 import routeGuard from '@/utils/routeGuard'
 import { withSession } from '@/utils/sessionWrapper'
 import { useFormik } from 'formik'
@@ -16,8 +16,9 @@ import { FaCirclePlus } from 'react-icons/fa6'
 export default function Pasien({accessToken}) {
     const route = useRouter()
     const [showAddModal, setShowAddModal] = useState(false)
+    const [showDeleteModal, setShowDeleteModal] = useState(false)
     const [showEditModal, setShowEditModal] = useState(false)
-    const [errorMessage, setErrorMessage] = useState('')
+    const [idPasien, setIdPasien] = useState()
     const [data, setData] = useState([]);
     const kolomPasien = [
         {
@@ -45,23 +46,26 @@ export default function Pasien({accessToken}) {
             cell: ({row}) => (
                 <td className='flex justify-center'>
                     <button onClick={() => route.push(`pasien/detail/${row.original.id}`)} className='bg-[#0080CC] text-white rounded px-[14px] py-[3px] font-semibold text-sm mr-2'>Detail</button>
-                    <button onClick={() => setShowEditModal(!showEditModal)} className='bg-[#FEC107] text-white rounded px-[14px] py-[3px] font-semibold text-sm mr-2'>Edit</button>
-                    <button className='bg-[#FF0000] text-white rounded px-[14px] py-[3px] font-semibold text-sm'>Hapus</button>
+                    <button onClick={() => openModalEdit(row.original.id)} className='bg-[#FEC107] text-white rounded px-[14px] py-[3px] font-semibold text-sm mr-2'>Edit</button>
+                    <button onClick={() => actionHapusPasien(row.original.id)} className='bg-[#FF0000] text-white rounded px-[14px] py-[3px] font-semibold text-sm'>Hapus</button>
                 </td>
             )
         
         }
     ]
+
+    const initialValues = {
+        nik: '',
+        fullname: '',
+        date_birth: '',
+        gender: '',
+        address: '',
+        work: '',
+        phone: '',
+      };
+
     const formik = useFormik({
-        initialValues:{
-            nik:'',
-            fullname:'',
-            date_birth: '',
-            gender: '',
-            address:'',
-            work:'',
-            phone:'',
-        },
+        initialValues,
         validate:(values) => {
             const requiredFields = [
                 'nik',
@@ -85,40 +89,59 @@ export default function Pasien({accessToken}) {
         },
         onSubmit: async (values) => {
             try {
-                toast.promise(
-                ClientRequest.CreatePasien(accessToken, values).then((res) => {
-
-                return res;
-                }), {
-                loading: 'Processing...',
-                success: (res) => {
-                    formik.resetForm();
-                    if (showAddModal === true) {
-                        setShowAddModal(!showAddModal);
+                if (showAddModal === true) {
+                    // Tambah Pasien
+                    toast.promise(
+                        ClientRequest.CreatePasien(accessToken, values).then((res) => {
+                        return res;
+                    }),
+                    {
+                        loading: 'Processing...',
+                        success: (res) =>{
+                            formik.resetForm();
+                            setShowAddModal(!showAddModal);
+                            getPasien();
+                            console.log(res, 'res sukse')
+                            return `${res.data.message}`
+                        } ,
+                        error: (error) => {
+                            console.log(error, 'res error')
+                            return `${error.response.data.message}`
+                        },
                     }
-                    if (showEditModal === true) {
+                    );
+            } else {
+                // Edit pasien
+                toast.promise(
+                    ClientRequest.UpdatePasien(accessToken, values, idPasien).then((res) => {
+                    return res;
+                }),
+                {
+                    loading: 'Processing...',
+                    success: (res) =>{
+                        formik.resetForm();
                         setShowEditModal(!showEditModal);
+                        getPasien();
+                        console.log(res, 'res sukses')
+                        return `${res.data.message}`
+                    } ,
+                    error: (error) => {
+                        console.log(error, 'res error')
+                        return `${error.response.data.message}`
+                    },
                 }
-                    return `${res.data.message}`;
-                },
-                error: (error) => {
-                    console.log(values, 'dataTerkirim');
-                    console.error(error);
-                    return `${error.response.data.message}`;
+                );
                 }
-                }
-            );
             } catch (error) {
                 console.error('Error during adding/editing pasien:', error);
                 toast.error('Terjadi kesalahan saat menambah/mengedit pasien.');
             }
-        }
+        },
     })
 
     const getPasien = async () => {
         try {
-            const res = await ClientRequest.GetPasien(accessToken);
-            console.log(res, 'response pasien');
+            const res = await ClientRequest.GetPasien(accessToken);;
             setData(res.data.data)
         } catch (error) {
             console.log(error);
@@ -126,11 +149,38 @@ export default function Pasien({accessToken}) {
     };
 
     const openModalEdit = async (id) => {
+        setIdPasien(id)
+        setShowEditModal(!showEditModal)
         try {
             const res = await ClientRequest.GetPasienById(accessToken, id)
+            const { nik, fullname, date_birth, gender, address, work, phone } = res.data.data;
+            formik.setValues({ nik, fullname, date_birth, gender, address, work, phone });
         } catch (error) {
-            
+            console.log(error)
         }
+    }
+
+    const hapusPasien = async () => {
+        try {
+            await toast.promise(
+                ClientRequest.DeletePasien(accessToken, idPasien),
+                {
+                    pending: 'Processing...',
+                    success: 'Sukses Delete Pasien',
+                    error: 'Gagal Delete Pasien',
+                }
+            );
+            getPasien();
+            setShowDeleteModal(!showDeleteModal);
+        } catch (error) {
+            console.error(error);
+        }
+    }
+    
+    const actionHapusPasien = async (id) => {
+        setIdPasien(id)
+        setShowDeleteModal(!showDeleteModal)
+        getPasien()
     }
 
     useEffect(() => {
@@ -138,6 +188,11 @@ export default function Pasien({accessToken}) {
     }, []);
     return (
         <div>
+            <ModalDelete
+                activeModal={showDeleteModal}
+                buttonClose={() => setShowDeleteModal(!showDeleteModal)}
+                submitButton={hapusPasien}
+            />
             <Modal 
                 activeModal={showAddModal}
                 title={`Tambah Pasien`}
@@ -156,20 +211,20 @@ export default function Pasien({accessToken}) {
                                 <h1>Pekerjaan</h1>
                             </div>
                             <div className='grid space-y-2 col-span-9'>
-                                <input type="number" className='py-[13px] px-[16px] border rounded w-full outline-none' onChange={formik.handleChange} value={formik.values.nik} name='nik' placeholder='NIK...'/>
+                                <input type="text" className='py-[13px] px-[16px] border rounded w-full outline-none' onChange={formik.handleChange} value={formik.values.nik} name='nik' placeholder='NIK...'/>
                                 {formik.touched.nik && formik.errors.nik && <p className='text-xs font-medium text-red-600 ml-1'>*{formik.errors.nik}</p>}
 
                                 <input type="text" className='py-[13px] px-[16px] border rounded w-full outline-none' onChange={formik.handleChange} value={formik.values.fullname} name='fullname' placeholder='Nama...'/>
                                 {formik.touched.fullname && formik.errors.fullname && <p className='text-xs font-medium text-red-600 ml-1'>*{formik.errors.fullname}</p>}
 
-                                <select onChange={formik.handleChange} defaultValue={formik.values.gender} className='py-[13px] px-[16px] border rounded w-full' name="gender">
+                                <select onChange={formik.handleChange} value={formik.values.gender} className='py-[13px] px-[16px] border rounded w-full' name="gender">
                                     <option value="">Pilih Jenis Kelamin...</option>
                                     <option value="Laki-laki">Laki-laki</option>
                                     <option value="Perempuan">Perempuan</option>
                                 </select>
                                 {formik.touched.gender && formik.errors.gender && <p className='text-xs font-medium text-red-600 ml-1'>*{formik.errors.gender}</p>}
 
-                                <input type="text" className='py-[13px] px-[16px] border rounded w-full outline-none' onChange={formik.handleChange} value={formik.values.alamatPasien} name='address' placeholder='Alamat...'/>
+                                <input type="text" className='py-[13px] px-[16px] border rounded w-full outline-none' onChange={formik.handleChange} value={formik.values.address} name='address' placeholder='Alamat...'/>
                                 {formik.touched.address && formik.errors.address && <p className='text-xs font-medium text-red-600 ml-1'>*{formik.errors.address}</p>}
 
                                 <input type="date" className='py-[13px] px-[16px] border rounded w-full outline-none' onChange={formik.handleChange} value={formik.values.date_birth} name='date_birth' placeholder='Tanggal Lahir...'/>
@@ -207,7 +262,7 @@ export default function Pasien({accessToken}) {
                                 <h1>Pekerjaan</h1>
                             </div>
                             <div className='grid space-y-2 col-span-9'>
-                                <input type="number" className='py-[13px] px-[16px] border rounded w-full outline-none' onChange={formik.handleChange} value={formik.values.nik} name='nik' placeholder='NIK...'/>
+                                <input type="text" className='py-[13px] px-[16px] border rounded w-full outline-none' onChange={formik.handleChange} value={formik.values.nik} name='nik' placeholder='NIK...'/>
                                 {formik.touched.nik && formik.errors.nik && <p className='text-xs font-medium text-red-600 ml-1'>*{formik.errors.nik}</p>}
 
                                 <input type="text" className='py-[13px] px-[16px] border rounded w-full outline-none' onChange={formik.handleChange} value={formik.values.fullname} name='fullname' placeholder='Nama...'/>
@@ -220,10 +275,10 @@ export default function Pasien({accessToken}) {
                                 </select>
                                 {formik.touched.gender && formik.errors.gender && <p className='text-xs font-medium text-red-600 ml-1'>*{formik.errors.gender}</p>}
 
-                                <input type="text" className='py-[13px] px-[16px] border rounded w-full outline-none' onChange={formik.handleChange} value={formik.values.alamatPasien} name='address' placeholder='Alamat...'/>
+                                <input type="text" className='py-[13px] px-[16px] border rounded w-full outline-none' onChange={formik.handleChange} value={formik.values.address} name='address' placeholder='Alamat...'/>
                                 {formik.touched.address && formik.errors.address && <p className='text-xs font-medium text-red-600 ml-1'>*{formik.errors.address}</p>}
 
-                                <input type="date" className='py-[13px] px-[16px] border rounded w-full outline-none' onChange={formik.handleChange} value={formik.values.date_birth} name='date_birth' placeholder='Tanggal Lahir...'/>
+                                <input type="date" className='py-[13px] px-[16px] border rounded w-full outline-none' onChange={formik.handleChange} value={formik.values.dateBirth} name='date_birth' placeholder='Tanggal Lahir...'/>
                                 {formik.touched.date_birth && formik.errors.date_birth && <p className='text-xs font-medium text-red-600 ml-1'>*{formik.errors.date_birth}</p>}
 
                                 <input type="number" className='py-[13px] px-[16px] border rounded w-full outline-none' onChange={formik.handleChange} value={formik.values.phone} name='phone' placeholder='Telepon...'/>
