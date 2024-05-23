@@ -167,8 +167,9 @@ class ClientRequest {
             }
         })
     }
-    static GetRekamMedis(token, keyword, page) {
-        let path = `rekam-medis?search=${keyword}&page=${page}`;
+
+    static GetRekamMedis(token) {
+        let path = `medical-record`;
         return request(`${this.urlAPI()}${path}`, {
             method: 'GET',
             headers: {
@@ -176,8 +177,9 @@ class ClientRequest {
             }
         })
     }
+
     static GetRekamMedisById(token, id) {
-        let path = `rekam-medis/${id}`;
+        let path = `medical-record/${id}`;
         return request(`${this.urlAPI()}${path}`, {
             method: 'GET',
             headers: {
@@ -187,7 +189,7 @@ class ClientRequest {
     }
 
     static CreateRekamMedis(token, data) {
-        let path = `rekam-medis`;
+        let path = `medical-record`;
         return request(`${this.urlAPI()}${path}`, {
             method: 'POST',
             data,

@@ -1,12 +1,15 @@
 import Table from '@/components/Table'
 import Sidebar from '@/components/sidebar'
+import ClientRequest from '@/utils/clientApiService'
 import routeGuard from '@/utils/routeGuard'
 import { withSession } from '@/utils/sessionWrapper'
 import { useRouter } from 'next/router'
 import React from 'react'
 
-export default function DetailPasien() {
+export default function DetailPasien(data) {
     const route = useRouter()
+    const dataPasien = data
+    console.log('data Pasien',data.data)
     const kolomRM = [
         {
             header: 'No.',
@@ -38,19 +41,19 @@ export default function DetailPasien() {
                 <h1>Navigasi / Pasien / <span className='text-cyan font-medium'>Detail Pasien</span></h1>
             </div>
             <div className='bg-white py-[39px] px-[32px] rounded-2xl'>
-                <h1 className='text-[24px] text-[#353A40] font-semibold mb-[32px]'>Detail Pasien</h1>
+                <h1 className='text-[24px] text-[#353A40] font-semibold mb-[32px]'>Detail Pasien {data.data.fullname}</h1>
                 <div className='flex items-start gap-[300px]'>
                     <div className='space-y-[16px] font-semibold'>
-                        <h1>Nomor Rekam Medis: <span className='text-slate-500 font-normal'>Lorem ipsum dolor sit.</span></h1>
-                        <h1>NIK: <span className='text-slate-500 font-normal'>Lorem ipsum dolor sit.</span></h1>
-                        <h1>Nama: <span className='text-slate-500 font-normal'>Lorem ipsum dolor sit.</span></h1>
-                        <h1>Jenis Kelamin: <span className='text-slate-500 font-normal'>Lorem ipsum dolor sit.</span></h1>
-                        <h1>Tanggal Lahir: <span className='text-slate-500 font-normal'>Lorem ipsum dolor sit.</span></h1>
+                        <h1>Nomor Rekam Medis: <span className='text-slate-500 font-normal'>{data.data.no_rm}</span></h1>
+                        <h1>NIK: <span className='text-slate-500 font-normal'>{data.data.nik}</span></h1>
+                        <h1>Nama: <span className='text-slate-500 font-normal'>{data.data.fullname}</span></h1>
+                        <h1>Jenis Kelamin: <span className='text-slate-500 font-normal'>{data.data.gender}</span></h1>
+                        <h1>Tanggal Lahir: <span className='text-slate-500 font-normal'>{data.data.date_birth}</span></h1>
                     </div>
                     <div className='space-y-[16px] font-semibold'>
-                        <h1>Pekerjaan: <span className='text-slate-500 font-normal'>Lorem ipsum dolor sit.</span></h1>
-                        <h1>Telepon: <span className='text-slate-500 font-normal'>Lorem ipsum dolor sit.</span></h1>
-                        <h1>Alamat: <span className='text-slate-500 font-normal'>Lorem ipsum dolor sit.</span></h1>
+                        <h1>Pekerjaan: <span className='text-slate-500 font-normal'>{data.data.work}</span></h1>
+                        <h1>Telepon: <span className='text-slate-500 font-normal'>{data.data.phone}</span></h1>
+                        <h1>Alamat: <span className='text-slate-500 font-normal'>{data.data.address}</span></h1>
                     </div>
                 </div>
                 <hr className='border my-[32px]'/>
@@ -62,11 +65,15 @@ export default function DetailPasien() {
     </div>
   )
 }
-export const getServerSideProps = withSession(async ({ req }) => {
+export const getServerSideProps = withSession(async ({ req, params }) => {
+    const {id} = params
 	const accessToken = req.session?.auth?.access_token
+    const res = await ClientRequest.GetPasienById(accessToken, id)
 	const isLoggedIn = !!accessToken
 	const validator = [isLoggedIn]
 	return routeGuard(validator, '/auth/login', {
-		props: {}
+		props: {
+            data: res.data.data
+        }
 	})
 })

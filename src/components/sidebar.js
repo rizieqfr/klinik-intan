@@ -2,7 +2,7 @@ import { useRouter } from 'next/router'
 import { FaBars, FaBookMedical, FaHandHoldingMedical, FaRupiahSign, FaUserDoctor, FaUserGear } from "react-icons/fa6";
 import { FaHome } from "react-icons/fa";
 import React, { useEffect, useState } from 'react'
-import { MdMedicalServices, MdPayments } from "react-icons/md";
+import { MdMedicalServices, MdOutlineRsvp, MdPayments, MdRsvp } from "react-icons/md";
 import { RiAdminFill, RiLogoutBoxFill } from "react-icons/ri";
 import Api from '../pages/api/hello';
 import toast from 'react-hot-toast';
@@ -70,15 +70,19 @@ export default function Sidebar() {
             </button>
             <button onClick={() => router.push('/dokter')} className={`${router.pathname === '/dokter' && 'bg-[#0179FF]'} hover:bg-[#0179FF] py-[8px] px-[37px] text-white font-semibold w-full flex items-center gap-2`}>
                 <FaUserDoctor  />
-                <h1 className='text-start'>Dokter</h1>
+                <h1 className='text-start'>Jadwal Dokter</h1>
             </button>
             <button onClick={() => router.push('/rekam-medis')} className={`${router.pathname === '/rekam-medis' && 'bg-[#0179FF]'} hover:bg-[#0179FF] py-[8px] px-[37px] text-white font-semibold w-full flex items-center gap-2`}>
                 <FaBookMedical />
                 <h1 className='text-start'>Rekam Medis</h1>
             </button>
-            <button onClick={() => router.push('/pelayanan')} className={`${router.pathname === '/pelayanan' && 'bg-[#0179FF]'} hover:bg-[#0179FF] py-[8px] px-[37px] text-white font-semibold w-full flex items-center gap-2`}>
+            {/* <button onClick={() => router.push('/pelayanan')} className={`${router.pathname === '/pelayanan' && 'bg-[#0179FF]'} hover:bg-[#0179FF] py-[8px] px-[37px] text-white font-semibold w-full flex items-center gap-2`}>
                 <MdMedicalServices />
                 <h1 className='text-start'>Pelayanan</h1>
+            </button> */}
+            <button onClick={() => router.push('/reservasi')} className={`${router.pathname === '/reservasi' && 'bg-[#0179FF]'} hover:bg-[#0179FF] py-[8px] px-[37px] text-white font-semibold w-full flex items-center gap-2`}>
+                <MdRsvp     />
+                <h1 className='text-start'>Reservasi</h1>
             </button>
             <button onClick={() => router.push('/pembayaran')} className={`${router.pathname === '/pembayaran' && 'bg-[#0179FF]'} hover:bg-[#0179FF] py-[8px] px-[37px] text-white font-semibold w-full flex items-center gap-2`}>
                 <MdPayments   />
