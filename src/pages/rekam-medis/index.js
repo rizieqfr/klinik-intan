@@ -53,7 +53,8 @@ export default function RekamMedis({accessToken, dataPasien, dataRekamMedis}) {
             keluhan:'',
             diagnosa:'',
             tindakan:'',
-            biaya: {layanan: '', obat: ''}
+            biaya: {layanan: '', obat: ''},
+            total: '100000'
         },
         validate:(values) => {
             const errors = {};
@@ -95,12 +96,13 @@ export default function RekamMedis({accessToken, dataPasien, dataRekamMedis}) {
                     {
                         loading: 'Processing...',
                         success: (res) =>{
+                            console.log('respon yang didapat', res)
                             formik.resetForm();
                             setShowAddModal(!showAddModal);
                             return `${res.data.message}`
                         } ,
                         error: (error) => {
-                            console.log(error)
+                            console.log('error nih',error)
                             return `${error.response.data.message}`
                         },
                     }

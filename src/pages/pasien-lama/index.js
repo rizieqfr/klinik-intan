@@ -1,17 +1,41 @@
 import Input from '@/components/input'
+import ClientRequest from '@/utils/clientApiService'
 import { useFormik } from 'formik'
 import { useRouter } from 'next/router'
 import React from 'react'
+import toast from 'react-hot-toast'
 
 export default function PasienLama() {
   const router = useRouter()
   const formik = useFormik({
     initialValues:{
       'nik': '',
-      'nomorRm': '',
+      'no_rm': '',
     },
-    onSubmit: (value) => {
-      console.log('data', value)
+    onSubmit: async (value) => {
+      try {
+        toast.promise(
+          ClientRequest.LoginPasien(value).then((res) => {
+            return res
+          }),
+          {
+            loading: 'Loading...',
+            success: (res) => {
+              console.log(res, 'res success')
+              return 'Berhasil Login!'
+            },
+            error: (error) => {
+              console.log(error, 'res failed')
+              return `${error.response.data.msg}`
+            }
+          }
+        )
+        
+        
+      } catch (error) {
+        console.log(value)
+        toast.error(error.data.message)
+      }
     }
   })
   return (
@@ -33,8 +57,8 @@ export default function PasienLama() {
                   <p>Jika anda pasien lama atau pernah berobat sebelumnya, silahkan menggunakan nomor rekam medis dan NIK(nomor KTP) anda untuk login.</p>
                   <p c>Jika Anda pasien baru dan belum pernah periksa sebelumnya, silahkan tekan tombol &quot;home&quot; untuk melakukan pendaftaran online di menu utama portal  ini.</p>
                   <div className='space-y-3'>
-                    <Input onChange={formik.handleChange} name={'nomorRm'} placeholder={'Nomor Rekam Medis'} type={'number'} />
-                    <Input onChange={formik.handleChange} name={'nik'} placeholder={'NIK'} type={'number'} />
+                    <Input onChange={formik.handleChange} name={'no_rm'} placeholder={'Nomor Rekam Medis'} type={'text'} />
+                    <Input onChange={formik.handleChange} name={'nik'} placeholder={'NIK'} type={'text'} />
                   </div>
                 <div className="flex items-center justify-center pt-6">
                   <button onClick={formik.handleSubmit} className="px-[40px] py-[20px] bg-[#0179FF] hover:bg-blue-700 text-white rounded-md shadow-md font-semibold">Log in</button>

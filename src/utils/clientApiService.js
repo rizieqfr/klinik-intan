@@ -19,6 +19,14 @@ class ClientRequest {
             },
         })
     }
+
+    static LoginPasien(data) {
+        let path = 'patient/login';
+        return request(`${this.urlAPI()}${path}`, {
+            method: 'POST',
+            data
+        })
+    }
     static Register(data) {
         let path = 'register';
         return request(`${this.urlAPI()}${path}`, {
@@ -35,8 +43,8 @@ class ClientRequest {
         })
     }
 
-    static Fetch(token) {
-        let path = `fetch`;
+    static CountDashboard(token) {
+        let path = `amount-dashboard`;
         return request(`${this.urlAPI()}${path}`, {
             method: 'GET',
             headers: {
