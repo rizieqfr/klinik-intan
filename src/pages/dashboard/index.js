@@ -3,6 +3,7 @@ import ClientRequest from '@/utils/clientApiService'
 import isEmpty from '@/utils/isEmpty'
 import routeGuard from '@/utils/routeGuard'
 import { withSession } from '@/utils/sessionWrapper'
+import Link from 'next/link'
 import React from 'react'
 import { FaBookMedical, FaHandHoldingMedical, FaUserGear } from 'react-icons/fa6'
 import { MdMedicalServices } from 'react-icons/md'
@@ -10,7 +11,7 @@ import { MdMedicalServices } from 'react-icons/md'
 export default function Dashboard({dataDashboard}) {
     console.log('Data Dashboard',dataDashboard)
   return (
-    <div className='bg-[#ECEFF4] flex gap-[32px] min-h-screen'>
+    <div className='bg-white flex gap-[32px] min-h-screen'>
         <Sidebar />
         <div className='w-full pr-[32px]'>
             <div className='flex items-center justify-between py-[40px]'>
@@ -18,7 +19,7 @@ export default function Dashboard({dataDashboard}) {
                 <h1>Navigasi / <span className='text-cyan font-medium'>Dashboard</span></h1>
             </div>
             <div className='grid grid-cols-3 gap-10'>
-                <div className='w-[348px] h-[143px] '>
+                <div className='w-[348px] h-[143px]  shadow-sm'>
                     <div className='px-[24px] py-[28px] bg-[#17A2B7] text-white rounded-t-lg'>
                         <div className='flex items-center justify-between'>
                             <div>
@@ -29,9 +30,13 @@ export default function Dashboard({dataDashboard}) {
                         </div>
                         
                     </div>
-                    <button className='w-full py-[8px] px-[90px] bg-white text-[#353A40] font-bold text-sm rounded-b-lg'>More info</button>
+                    <Link href={'pasien'}>
+                        <button className='w-full py-[8px] border-b-2  bg-white flex items-center justify-center text-[#353A40] font-bold text-sm rounded-b-lg'>
+                            More info
+                        </button>
+                    </Link>
                 </div>
-                <div className='w-[348px] h-[143px] '>
+                <div className='w-[348px] h-[143px]  shadow-sm'>
                     <div className='px-[24px] py-[28px] bg-[#27A844] text-white rounded-t-lg'>
                         <div className='flex items-center justify-between'>
                             <div>
@@ -42,9 +47,13 @@ export default function Dashboard({dataDashboard}) {
                         </div>
 
                     </div>
-                    <button className='w-full py-[8px] px-[90px] bg-white text-[#353A40] font-bold text-sm rounded-b-lg'>More info</button>
+                    <Link href={'rekam-medis'}>
+                        <button className='w-full py-[8px] border-b-2  bg-white flex items-center justify-center text-[#353A40] font-bold text-sm rounded-b-lg'>
+                            More info   
+                        </button>
+                    </Link>
                 </div>
-                <div className='w-[348px] h-[143px] '>
+                <div className='w-[348px] h-[143px]  shadow-sm'>
                     <div className='px-[24px] py-[28px] bg-[#DC3546] text-white rounded-t-lg'>
                         <div className='flex items-center justify-between'>
                             <div>
@@ -54,9 +63,13 @@ export default function Dashboard({dataDashboard}) {
                             <MdMedicalServices className='text-4xl' />
                         </div>
                     </div>
-                    <button className='w-full py-[8px] px-[90px] bg-white text-[#353A40] font-bold text-sm rounded-b-lg'>More info</button>
+                    <Link href={'pelayanan'}>
+                        <button className='w-full py-[8px] border-b-2  bg-white flex items-center justify-center text-[#353A40] font-bold text-sm rounded-b-lg'>
+                            More info 
+                        </button>
+                    </Link>
                 </div>
-                <div className='w-[348px] h-[143px] '>
+                <div className='w-[348px] h-[143px]  shadow-sm'>
                     <div className='px-[24px] py-[28px] bg-[#DC3546] text-white rounded-t-lg'>
                         <div className='flex items-center justify-between'>
                             <div>
@@ -66,9 +79,13 @@ export default function Dashboard({dataDashboard}) {
                             <FaUserGear className='text-4xl' />
                         </div>
                     </div>
-                    <button className='w-full py-[8px] px-[90px] bg-white text-[#353A40] font-bold text-sm rounded-b-lg'>More info</button>
+                    <Link href={'user-management'}>
+                        <button className='w-full py-[8px] border-b-2  bg-white flex items-center justify-center text-[#353A40] font-bold text-sm rounded-b-lg'>
+                            More info   
+                        </button>
+                    </Link>
                 </div>
-                <div className='w-[348px] h-[143px] '>
+                <div className='w-[348px] h-[143px]  shadow-sm'>
                     <div className='px-[24px] py-[28px] bg-[#17A2B7] text-white rounded-t-lg'>
                         <div className='flex items-center justify-between'>
                             <div>
@@ -78,7 +95,11 @@ export default function Dashboard({dataDashboard}) {
                             <FaUserGear className='text-4xl' />
                         </div>
                     </div>
-                    <button className='w-full py-[8px] px-[90px] bg-white text-[#353A40] font-bold text-sm rounded-b-lg'>More info</button>
+                    <Link href={'jadwal-dokter'}>
+                        <button className='w-full py-[8px] border-b-2  bg-white flex items-center justify-center text-[#353A40] font-bold text-sm rounded-b-lg'>
+                            More info 
+                        </button>
+                    </Link>
                 </div>
                 
             </div>

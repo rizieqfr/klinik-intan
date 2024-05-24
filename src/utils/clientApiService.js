@@ -208,7 +208,7 @@ class ClientRequest {
     }
 
     static UpdateRekamMedis(token, data, id) {
-        let path = `rekam-medis/put/${id}`;
+        let path = `medical-record/${id}`;
         return request(`${this.urlAPI()}${path}`, {
             method: 'PUT',
             data,
@@ -231,7 +231,7 @@ class ClientRequest {
     // Payment
 
     static GetPayment(token, keyword, page) {
-        let path = `invoice?search=${keyword}&page=${page}`;
+        let path = `transaction`;
         return request(`${this.urlAPI()}${path}`, {
             method: 'GET',
             headers: {

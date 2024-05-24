@@ -297,7 +297,7 @@ export default function UserManagement({accessToken}) {
                 </div>
                 }
         />
-        <div className='bg-[#ECEFF4] flex gap-[32px] min-h-screen'>
+        <div className='bg-white flex gap-[32px] min-h-screen'>
             <Sidebar />
             <div className='w-full pr-[32px]'>
                 <div className='flex items-center justify-between pt-[40px] mb-4'>
