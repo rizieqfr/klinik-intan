@@ -5,6 +5,7 @@ import ClientRequest from '@/utils/clientApiService'
 import routeGuard from '@/utils/routeGuard'
 import { withSession } from '@/utils/sessionWrapper'
 import { useFormik } from 'formik'
+import Link from 'next/link'
 import { useRouter } from 'next/router'
 import React, { useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
@@ -19,6 +20,7 @@ export default function RekamMedis({accessToken, dataPasien}) {
     const getRekamMedis = async () => {
         try {
             const res = await ClientRequest.GetRekamMedis(accessToken)
+            console.log(res)
             setDataRekamMedis(res.data.data)
         } catch (error) {
             console.log(error)
@@ -51,7 +53,7 @@ export default function RekamMedis({accessToken, dataPasien}) {
             header: () => <div>Action</div>,
             cell: ({row}) => (
                 <td className='flex justify-center'>
-                    <button onClick={() => route.push('pasien/detail')} className='bg-[#0080CC] text-white rounded px-[14px] py-[3px] font-semibold text-sm mr-2'>Detail</button>
+                    <Link href={`rekam-medis/detail/${row.original.id}`}  className='bg-[#0080CC] text-white rounded px-[14px] py-[3px] font-semibold text-sm mr-2'>Detail</Link>
                     <button onClick={() => openModalEdit(row.original.id)} className='bg-[#FEC107] text-white rounded px-[14px] py-[3px] font-semibold text-sm mr-2'>Edit</button>
                     <button className='bg-[#FF0000] text-white rounded px-[14px] py-[3px] font-semibold text-sm'>Hapus</button>
                 </td>

@@ -22,7 +22,9 @@ export default function PasienLama() {
             loading: 'Loading...',
             success: (res) => {
               console.log(res, 'res success')
-              return 'Berhasil Login!'
+              localStorage.setItem('token-pasien', res.data.accessToken)
+              router.push('/reservasi-pasien')
+              return 'Login Berhasil! Silahkan Pilih Jadwal Untuk Reservasi'
             },
             error: (error) => {
               console.log(error, 'res failed')
@@ -38,6 +40,8 @@ export default function PasienLama() {
       }
     }
   })
+
+  
   return (
     <>
         <section className="bg-[#00A9AE] w-full px-[80px] py-[25px]">
@@ -47,7 +51,7 @@ export default function PasienLama() {
                 <button onClick={() => router.push('/')} className="text-lg font-semibold text-white hover:font-bold hover:underline">Home</button>
                 <button onClick={() => router.push('/jadwal-dokter')} className="text-lg font-semibold text-white hover:font-bold hover:underline">Jadwal Praktek</button>
                 <button onClick={() => router.push('/pasien-lama')} className="text-lg font-bold underline text-white">Pasien Lama</button>
-            </div>
+            </div>  
             </div>
         </section>
         <section className='bg-white h-screen'>

@@ -64,8 +64,8 @@ class ClientRequest {
     }
 
     // User Management
-    static GetUserManagement(token) {
-        let path = `user`;
+    static GetUserManagement(token, page, search, sorting) {
+        let path = `user-management?page=${page}&search=${search}&sorting=${sorting}`;
         return request(`${this.urlAPI()}${path}`, {
             method: 'GET',
             headers: {
@@ -74,7 +74,7 @@ class ClientRequest {
         })
     }
     static GetUserManagementById(token, id) {
-        let path = `user/${id}`;
+        let path = `user-management/${id}`;
         return request(`${this.urlAPI()}${path}`, {
             method: 'GET',
             headers: {
@@ -104,7 +104,7 @@ class ClientRequest {
     }
     
     static DeleteUserManagement(token, id) {
-        let path = `user/${id}`;
+        let path = `user-management/${id}`;
         return request(`${this.urlAPI()}${path}`, {
             method: 'DELETE',
             headers: {
@@ -225,6 +225,23 @@ class ClientRequest {
             headers: {
                 'Authorization': `Bearer ${token}`,
             },
+        })
+    }
+
+    // Jadwal Dokter
+    static GetJadwalDokterPasien(token, keyword, page) {
+        let path = `transaction`;
+        return request(`${this.urlAPI()}${path}`, {
+            method: 'GET',
+        })
+    }
+    static GetJadwalDokterPasien(token, keyword, page) {
+        let path = `transaction`;
+        return request(`${this.urlAPI()}${path}`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
         })
     }
 

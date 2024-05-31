@@ -3,32 +3,47 @@ import Sidebar from '@/components/sidebar'
 import ClientRequest from '@/utils/clientApiService'
 import routeGuard from '@/utils/routeGuard'
 import { withSession } from '@/utils/sessionWrapper'
+import moment from 'moment'
 import { useRouter } from 'next/router'
 import React from 'react'
+import 'moment/locale/id';  // Import the Indonesian locale
 
+moment.locale('id');  // Set the locale to Indonesian
 export default function DetailPasien(data) {
     const route = useRouter()
-    const dataPasien = data
+    const dataRekamMedis = data.data.medical_records
     console.log('data Pasien',data.data)
     const kolomRM = [
         {
-            header: 'No.',
+            header: 'No',
             accessorKey: 'id',
             cell: ({row}) => (
-                <div>{row.original.id}.</div>
+                <div>{row.index + 1}.</div>
             )
         },
         {
             header: 'Tanggal',
-            accessorKey: 'tanggal',
+            accessorKey: 'createdAt',
+            cell: ({ row }) => {
+                const date = moment(row.original.createdAt).format('dddd, D MMMM YYYY');
+                return <div>{date}</div>;
+            }
         },
         {
             header: 'Jenis Pelayanan',
-            accessorKey: 'nik',
+            accessorKey: 'pelayanan',
         },
         {
             header: 'Keluhan',
-            accessorKey: 'alamat',
+            accessorKey: 'keluhan',
+        },
+        {
+            header: 'Tindakan',
+            accessorKey: 'tindakan',
+        },
+        {
+            header: 'Diagnosa',
+            accessorKey: 'diagnosa',
         },
         
     ]
@@ -48,7 +63,7 @@ export default function DetailPasien(data) {
                         <h1>NIK: <span className='text-slate-500 font-normal'>{data.data.nik}</span></h1>
                         <h1>Nama: <span className='text-slate-500 font-normal'>{data.data.fullname}</span></h1>
                         <h1>Jenis Kelamin: <span className='text-slate-500 font-normal'>{data.data.gender}</span></h1>
-                        <h1>Tanggal Lahir: <span className='text-slate-500 font-normal'>{data.data.date_birth}</span></h1>
+                        <h1>Tanggal Lahir: <span className='text-slate-500 font-normal'>{ moment(data.data.date_birth).format('dddd, D MMMM YYYY')}</span></h1>
                     </div>
                     <div className='space-y-[16px] font-semibold'>
                         <h1>Pekerjaan: <span className='text-slate-500 font-normal'>{data.data.work}</span></h1>
@@ -58,7 +73,7 @@ export default function DetailPasien(data) {
                 </div>
                 <hr className='border my-[32px]'/>
                 <h1 className='text-[24px] text-[#353A40] font-semibold mb-[32px]'>Daftar Rekam Medis</h1>
-                <Table data={''} columns={kolomRM}/>
+                <Table data={dataRekamMedis} columns={kolomRM}/>
 
             </div>
         </div>

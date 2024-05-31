@@ -1,5 +1,28 @@
+import Table from '@/components/Table'
 import { useRouter } from 'next/router'
 import React from 'react'
+
+const kolomJadwalDokter = [
+    {
+        header: 'No Rm',
+        accessorKey: 'no_rm',
+        cell: ({row}) => (
+            <div>{row.original.no_rm}</div>
+        )
+    },
+    {
+        header: 'Nama',
+        accessorKey: 'fullname',
+    },
+    {
+        header: 'NIK',
+        accessorKey: 'nik',
+    },
+    {
+        header: 'Alamat',
+        accessorKey: 'address',
+    }
+]
 
 export default function JadwalDokter() {
     const router = useRouter()
@@ -15,10 +38,12 @@ export default function JadwalDokter() {
                 </div>
                 </div>
             </section>
-            <section className='bg-white h-screen'>
+            <section className='bg-white h-screen flex items-start justify-center'>
                 <div className='py-10'>
                     <h1 className="text-4xl font-semibold mb-10 text-center">Jadwal Dokter</h1>
                     {/* Tanstack Table */}
+                    <Table data={''} columns={kolomJadwalDokter} />
+
                 </div>
             </section>
         </>

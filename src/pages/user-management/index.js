@@ -118,6 +118,7 @@ export default function UserManagement({accessToken}) {
                         return `${res.data.message}`
                     } ,
                     error: (error) => {
+                        console.log(error, 'errorPOST')
                         return `${error.response.data.message}`
                     },
                 }
@@ -136,6 +137,7 @@ export default function UserManagement({accessToken}) {
         setShowEditModal(!showEditModal)
         try {
             const res = await ClientRequest.GetUserManagementById(accessToken, id)
+            console.log(res, 'resById')
             const { fullname, username, password, phone, email, roleId } = res.data.data;
             formik.setValues({ fullname, username, password, phone, email, roleId });
         } catch (error) {
@@ -148,7 +150,7 @@ export default function UserManagement({accessToken}) {
             await toast.promise(
                 ClientRequest.DeleteUserManagement(accessToken, idUser),
                 {
-                    pending: 'Processing...',
+                    loading: 'Processing...',
                     success: 'Sukses Delete User',
                     error: 'Gagal Delete User',
                 }
@@ -168,7 +170,7 @@ export default function UserManagement({accessToken}) {
 
     const getUser = async () => {
         try {
-            const res = await ClientRequest.GetUserManagement(accessToken)
+            const res = await ClientRequest.GetUserManagement(accessToken, '','','')
             console.log(res,'dataUser')
             setDataUser(res.data.data)
         } catch (error) {
@@ -267,26 +269,26 @@ export default function UserManagement({accessToken}) {
                             <h1>Role</h1>
                         </div>
                         <div className='grid space-y-2 col-span-9'>
-                            <input onChange={formik.handleChange} type="text" className='py-[13px] px-[16px] border rounded w-full' name='nama' placeholder='Nama...'/>
-                            {formik.touched.nama && formik.errors.nama && <p className='text-xs font-medium text-red-600 ml-1'>*{formik.errors.nama}</p>}
+                            <input onChange={formik.handleChange} type="text" className='py-[13px] px-[16px] border rounded w-full' value={formik.values.fullname} name='fullname' placeholder='Nama...'/>
+                            {formik.touched.fullname && formik.errors.fullname && <p className='text-xs font-medium text-red-600 ml-1'>*{formik.errors.fullname}</p>}
 
-                            <input onChange={formik.handleChange} type="text" className='py-[13px] px-[16px] border rounded w-full' name='username' placeholder='Username...'/>
+                            <input onChange={formik.handleChange} type="text" className='py-[13px] px-[16px] border rounded w-full' value={formik.values.username} name='username' placeholder='Username...'/>
                             {formik.touched.username && formik.errors.username && <p className='text-xs font-medium text-red-600 ml-1'>*{formik.errors.username}</p>}
 
-                            <input onChange={formik.handleChange} type="password" className='py-[13px] px-[16px] border rounded w-full' name='password'  placeholder='Password...'/>
+                            <input onChange={formik.handleChange} type="password" className='py-[13px] px-[16px] border rounded w-full' value={formik.values.password} name='password'  placeholder='******'/>
                             {formik.touched.password && formik.errors.password && <p className='text-xs font-medium text-red-600 ml-1'>*{formik.errors.password}</p>}
 
-                            <input onChange={formik.handleChange} type="text" className='py-[13px] px-[16px] border rounded w-full' name='email' placeholder='Email...'/>
+                            <input onChange={formik.handleChange} type="text" className='py-[13px] px-[16px] border rounded w-full' value={formik.values.email} name='email' placeholder='Email...'/>
                             {formik.touched.email && formik.errors.email && <p className='text-xs font-medium text-red-600 ml-1'>*{formik.errors.email}</p>}
 
-                            <select onChange={formik.handleChange} className='py-[13px] px-[16px] border rounded w-full' name="role" id="">
+                            <select onChange={formik.handleChange} className='py-[13px] px-[16px] border rounded w-full' name="roleId" value={formik.values.roleId} id="">
                                 <option value="">Pilih Role...</option>
                                 {Object.values(dataRole).map((item, idx) => (
                                     <option key={idx} value={item.id}>{item.name}</option>
 
                                 ))}
                             </select>
-                            {formik.touched.role && formik.errors.role && <p className='text-xs font-medium text-red-600 ml-1'>*{formik.errors.role}</p>}
+                            {formik.touched.roleId && formik.errors.roleId && <p className='text-xs font-medium text-red-600 ml-1'>*{formik.errors.roleId}</p>}
                         </div>
                     </div>
                     <div className='flex items-center justify-end gap-3'>
