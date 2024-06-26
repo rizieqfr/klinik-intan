@@ -42,10 +42,6 @@ export default function Pasien({accessToken}) {
             accessorKey: 'address',
         },
         {
-            header: 'Jenis Perawatan',
-            accessorKey: 'jenisPerawatan',
-        },
-        {
             accessorKey: 'id',
             header: () => <div></div>,
             cell: ({row}) => (
@@ -264,7 +260,7 @@ export default function Pasien({accessToken}) {
 
                                 <input type="text" className='py-[13px] px-[16px] border rounded w-full outline-none' onChange={formik.handleChange} name='work' placeholder='Pekerjaan...'/>
                                 {formik.touched.work && formik.errors.work && <p className='text-xs font-medium text-red-600 ml-1'>*{formik.errors.work}</p>}
-                                
+
                                 <input type="text" className='py-[13px] px-[16px] border rounded w-full outline-none' onChange={formik.handleChange} name='riwayatAlergiObat' placeholder='Riwayat Alergi Obat...'/>
                                 {formik.touched.riwayatAlergiObat && formik.errors.riwayatAlergiObat && <p className='text-xs font-medium text-red-600 ml-1'>*{formik.errors.riwayatAlergiObat}</p>}
 

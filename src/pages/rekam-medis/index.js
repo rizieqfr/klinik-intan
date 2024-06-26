@@ -333,7 +333,7 @@ export default function RekamMedis({accessToken, dataPasien, dataReservasi}) {
                         <h1>Tambah</h1>
                     </button>
                 </div>
-                <div className='w-[1200px] overflow-auto'>
+                <div className='w-full overflow-auto'>
                     <Table data={dataRekamMedis} columns={kolomRekamMedis} />
                 </div>
                 

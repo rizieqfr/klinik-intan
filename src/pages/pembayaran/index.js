@@ -179,7 +179,7 @@ export default function Pembayaran({accessToken}) {
                     </div>
 
                 </div>
-                }
+            }
         />
         <div className='bg-white flex gap-[32px] min-h-screen'>
             <Sidebar />
