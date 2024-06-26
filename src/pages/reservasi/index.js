@@ -34,6 +34,15 @@ export default function Reservasi({accessToken}) {
         }
     }
 
+    const getDataDokter = async () => {
+        try {
+            const res = await ClientRequest.GetJadwalDokterAll('','','','')
+            setDataDokter(res.data.data)
+        } catch (error) {
+            
+        }
+    }
+
     const getDataPasien = async () => {
         try {
             const res = await ClientRequest.GetPasien(accessToken)
@@ -134,6 +143,7 @@ export default function Reservasi({accessToken}) {
     useEffect(() => {
         getDataReservasi()
         getDataPasien()
+        getDataDokter()
     }, [])
     useEffect(() => {
         formik.setFieldValue('date', date);
