@@ -46,7 +46,7 @@ export default function PasienLama() {
     <>
         <section className="bg-[#00A9AE] w-full px-[80px] py-[25px]">
             <div className="flex items-center justify-between">
-            <h1 className="text-[32px] font-bold text-white">Klinik Intan Husada</h1>
+            <h1 className="text-[32px] font-bold text-white">Klinik Nur Hidayah</h1>
             <div className="flex items-center gap-10">
                 <button onClick={() => router.push('/')} className="text-lg font-semibold text-white hover:font-bold hover:underline">Home</button>
                 <button onClick={() => router.push('/jadwal-dokter')} className="text-lg font-semibold text-white hover:font-bold hover:underline">Jadwal Praktek</button>

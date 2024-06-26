@@ -44,7 +44,7 @@ export default function Home() {
     <>
       <section className="bg-[#00A9AE] w-full px-[80px] py-[25px]">
         <div className="flex items-center justify-between">
-          <h1 className="text-[32px] font-bold text-white">Klinik Intan Husada</h1>
+          <h1 className="text-[32px] font-bold text-white">Klinik Nur Hidayah</h1>
           <div className="flex items-center gap-10">
             <button onClick={() => router.push('/')} className="text-lg font-bold underline text-white">Home</button>
             <button onClick={() => router.push('/jadwal-dokter')} className="text-lg font-semibold text-white hover:font-bold hover:underline">Jadwal Praktek</button>
@@ -63,7 +63,7 @@ export default function Home() {
                   <Input type={'text'} name={'phone'} onChange={formik.handleChange} placeholder={'Nomor Hp / Telepon'}/>
                 </div>
                 <div className="w-full">
-                  <Input type={'number'} name={'nik'} onChange={formik.handleChange} placeholder={'NIK'}/>
+                  <Input  name={'nik'} onChange={formik.handleChange} placeholder={'NIK'}/>
                 </div>
               </div>
               <Input type={'text'} name={'gender'} onChange={formik.handleChange} placeholder={'Jenis Kelamin'}/>

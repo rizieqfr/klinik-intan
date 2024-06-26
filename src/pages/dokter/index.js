@@ -1,48 +1,68 @@
 import Table from '@/components/Table'
 import Modal from '@/components/modal'
 import Sidebar from '@/components/sidebar'
+import ClientRequest from '@/utils/clientApiService'
+import routeGuard from '@/utils/routeGuard'
+import { withSession } from '@/utils/sessionWrapper'
 import { useFormik } from 'formik'
+import { ceil } from 'lodash'
+import moment from 'moment'
 import { useRouter } from 'next/router'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
 import { FaCirclePlus } from 'react-icons/fa6'
 
-export default function Dokter() {
+export default function Dokter({accessToken}) {
     const [showAddModal, setShowAddModal] = useState(false)
     const [showEditModal, setShowEditModal] = useState(false)
+    const [idDokter, setIdDokter] = useState('')
+    const [dataJadwalDokter, setDataJadwalDokter] = useState('')
     const route = useRouter()
     const kolomDokter = [
         {
             header: 'No',
-            accessorKey: 'id',
+            cell: (info) => (
+                <h1>{info.row.index + 1}</h1>
+            )
         },
         {
             header: 'Hari Kerja',
-            accessorKey: '',
+            accessorKey: 'hariKerja',
         },
         {
             header: 'Nama Dokter',
-            accessorKey: '',
+            accessorKey: 'namaDokter',
         },
         {
-            header: 'Poliklinik',
-            accessorKey: '',
+            header: 'Poli',
+            accessorKey: 'poli',
         },
         {
             header: 'Jam Mulai',
-            accessorKey: '',
+            accessorKey: 'jamMulai',
+            cell: (row) => {
+                return(
+                    <h1>{moment(row.row.original.jamMulai, 'HH:mm:ss').format('HH:mm')}</h1>
+                )
+            }
         },
         {
             header: 'Jam Selesai',
-            accessorKey: '',
+            accessorKey: 'jamSelesai',
+            cell: (row) => {
+                return(
+                    <h1>{moment(row.row.original.jamSelesai, 'HH:mm:ss').format('HH:mm')}</h1>
+
+                )
+            }
         },
         {
             accessorKey: 'id',
             header: () => <div></div>,
             cell: ({row}) => (
                 <td className='flex justify-center'>
-                    <button onClick={() => setShowEditModal(!showEditModal)} className='bg-[#FEC107] text-white rounded px-[14px] py-[3px] font-semibold text-sm mr-2'>Edit</button>
-                    <button className='bg-[#FF0000] text-white rounded px-[14px] py-[3px] font-semibold text-sm'>Hapus</button>
+                    <button onClick={() => openEditJadwalDokter(row.original.id)} className='bg-[#FEC107] text-white rounded px-[14px] py-[3px] font-semibold text-sm mr-2'>Edit</button>
+                    <button  className='bg-[#FF0000] text-white rounded px-[14px] py-[3px] font-semibold text-sm'>Hapus</button>
                 </td>
             )
         
@@ -51,7 +71,7 @@ export default function Dokter() {
     const formik = useFormik({
         initialValues:{
             namaDokter:'',
-            poliklinik:'',
+            poli:'',
             hariKerja:'',
             jamMulai:'',
             jamSelesai:'',
@@ -59,7 +79,7 @@ export default function Dokter() {
         validate:(values) => {
             const requiredFields = [
                 "namaDokter",
-                "poliklinik",
+                "poli",
                 "hariKerja",
                 "jamMulai",
                 "jamSelesai",
@@ -75,20 +95,78 @@ export default function Dokter() {
             
             return errors;
         },
-        onSubmit: (values) => {
-            console.log(values)
-            formik.resetForm()
-            
-            if(showAddModal === true) {
-                setShowAddModal(!showAddModal)
-                toast.success('Sukses Tambah Dokter')
-            }
-            if(showEditModal === true) {
-                setShowEditModal(!showEditModal)
-                toast.success('Sukses Edit Dokter')
+        onSubmit: async (values) => {
+            try {
+                if (showAddModal === true) {
+                    await toast.promise(
+                        ClientRequest.CreateJadwalDokter(accessToken, values).then((res) => {
+                            return res;
+                        }),
+                        {
+                            loading: 'Processing...',
+                            success: (res) => {
+                                formik.resetForm();
+                                setShowAddModal(!showAddModal);
+                                getJadwalDokter();
+                                return 'Sukses Create Jadwal Dokter';
+                            },
+                            error: 'Gagal Create Jadwal Dokter',
+                        }
+                    );
+                } else {
+                    await toast.promise(
+                        ClientRequest.UpdateJadwalDokter(accessToken, values, idDokter).then((res) => {
+                            return res;
+                        }),
+                        {
+                            loading: 'Processing...',
+                            success: (res) => {
+                                formik.resetForm();
+                                setShowEditModal(!showEditModal);
+                                getJadwalDokter();
+
+                                return 'Sukses Update Jadwal Dokter';
+                            },
+                            error: (res) => {
+                                return 'Gagal Update Jadwal Dokter';
+                            },
+                        }
+                    );
+                }
+            } catch (error) {
+                console.log(error);
             }
         }
+        
     })
+
+    const getJadwalDokter = async () => {
+        try {
+            const res = await ClientRequest.GetJadwalDokterAdmin(accessToken,'','','')
+            console.log('Data Jadwal Dokter:', res)
+            setDataJadwalDokter(res.data.data)
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
+    const openEditJadwalDokter = async (id) => {
+        setIdDokter(id)
+        setShowEditModal(!showEditModal)
+        try {
+            const res = await ClientRequest.GetJadwalDokterById(accessToken, id)
+            console.log(res, 'resDokter')
+            const { namaDokter ,poli ,hariKerja ,jamMulai ,jamSelesai } = res.data.data;
+            formik.setValues( { namaDokter , poli , hariKerja , jamMulai , jamSelesai } )
+            
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
+    useEffect(() => {
+        getJadwalDokter()
+    }, [])
   return (
     <div>
         <Modal 
@@ -107,25 +185,23 @@ export default function Dokter() {
 
                     </div>
                     <div className='flex items-center justify-start w-full text-sm'>
-                        <h1 className='text-[#353A40] font-semibold w-[20%]'>Poliklinik</h1>
+                        <h1 className='text-[#353A40] font-semibold w-[20%]'>Poli</h1>
                         <div className='w-full'>
-                            <input onChange={formik.handleChange} type="text" className='py-[13px] px-[16px] border rounded w-full outline-none' placeholder='Poliklinik...' value={formik.values.poliklinik} name='poliklinik'/>
-                            {formik.touched.poliklinik && formik.errors.poliklinik && <p className='text-xs font-medium text-red-600 ml-1'>*    {formik.errors.poliklinik}</p>}
+                            <input onChange={formik.handleChange} type="text" className='py-[13px] px-[16px] border rounded w-full outline-none' placeholder='Poli...' value={formik.values.poli} name='poli'/>
+                            {formik.touched.poli && formik.errors.poli && <p className='text-xs font-medium text-red-600 ml-1'>*    {formik.errors.poli}</p>}
                         </div>
 
                     </div>
                     <div className='flex items-center justify-start w-full text-sm'>
                         <h1 className='text-[#353A40] font-semibold w-[20%]'>Hari Kerja</h1>
                         <div className='w-full'>
-                            <select onChange={(val) => formik.setFieldValue('hariKerja', val)} className='py-[13px] px-[16px] border rounded w-full outline-none' value={formik.values.hariKerja} name="hariKerja">
+                            <select onChange={formik.handleChange} className='py-[13px] px-[16px] border rounded w-full outline-none' value={formik.values.hariKerja} name="hariKerja">
                                 <option value="">Pilih Hari Kerja...</option>
                                 <option value="Senin">Senin</option>
                                 <option value="Selasa">Selasa</option>
                                 <option value="Rabu">Rabu</option>
                                 <option value="Kamis">Kamis</option>
                                 <option value="Jumat">Jumat</option>
-                                <option value="Sabtu">Sabtu</option>
-                                <option value="Minggu">Minggu</option>
                             </select>
                             {formik.touched.hariKerja && formik.errors.hariKerja && <p className='text-xs font-medium text-red-600 ml-1'>*  {formik.errors.hariKerja}</p>}
                         </div>
@@ -173,17 +249,17 @@ export default function Dokter() {
 
                     </div>
                     <div className='flex items-center justify-start w-full text-sm'>
-                        <h1 className='text-[#353A40] font-semibold w-[20%]'>Poliklinik</h1>
+                        <h1 className='text-[#353A40] font-semibold w-[20%]'>Poli</h1>
                         <div className='w-full'>
-                            <input onChange={formik.handleChange} type="text" className='py-[13px] px-[16px] border rounded w-full outline-none' placeholder='Poliklinik...' value={formik.values.poliklinik} name='poliklinik'/>
-                            {formik.touched.poliklinik && formik.errors.poliklinik && <p className='text-xs font-medium text-red-600 ml-1'>*    {formik.errors.poliklinik}</p>}
+                            <input onChange={formik.handleChange} type="text" className='py-[13px] px-[16px] border rounded w-full outline-none' placeholder='Poli...' value={formik.values.poli} name='poli'/>
+                            {formik.touched.poli && formik.errors.poli && <p className='text-xs font-medium text-red-600 ml-1'>*    {formik.errors.poli}</p>}
                         </div>
 
                     </div>
                     <div className='flex items-center justify-start w-full text-sm'>
                         <h1 className='text-[#353A40] font-semibold w-[20%]'>Hari Kerja</h1>
                         <div className='w-full'>
-                            <select onChange={(val) => formik.setFieldValue('hariKerja', val)} className='py-[13px] px-[16px] border rounded w-full outline-none' value={formik.values.hariKerja} name="hariKerja">
+                            <select onChange={formik.handleChange} className='py-[13px] px-[16px] border rounded w-full outline-none' value={formik.values.hariKerja} name="hariKerja">
                                 <option value="">Pilih Hari Kerja...</option>
                                 <option value="Senin">Senin</option>
                                 <option value="Selasa">Selasa</option>
@@ -236,9 +312,18 @@ export default function Dokter() {
                         <h1>Tambah</h1>
                     </button>
                 </div>
-                <Table data={''} columns={kolomDokter}/>
+                <Table data={dataJadwalDokter} columns={kolomDokter}/>
             </div>
         </div>
     </div>
   )
 }
+
+export const getServerSideProps = withSession(async ({ req }) => {
+	const accessToken = req.session?.auth?.access_token
+	const isLoggedIn = !!accessToken
+	const validator = [isLoggedIn]
+	return routeGuard(validator, '/auth/login', {
+		props: {accessToken}
+	})
+})

@@ -9,7 +9,7 @@ import { FaBookMedical, FaHandHoldingMedical, FaUserGear } from 'react-icons/fa6
 import { MdMedicalServices } from 'react-icons/md'
 
 export default function Dashboard({dataDashboard}) {
-    console.log('Data Dashboard',dataDashboard)
+    console.log(dataDashboard)
   return (
     <div className='bg-white flex gap-[32px] min-h-screen'>
         <Sidebar />
@@ -95,7 +95,7 @@ export default function Dashboard({dataDashboard}) {
                             <FaUserGear className='text-4xl' />
                         </div>
                     </div>
-                    <Link href={'jadwal-dokter'}>
+                    <Link href={'dokter'}>
                         <button className='w-full py-[8px] border-b-2  bg-white flex items-center justify-center text-[#353A40] font-bold text-sm rounded-b-lg'>
                             More info 
                         </button>

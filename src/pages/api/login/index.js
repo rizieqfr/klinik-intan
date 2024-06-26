@@ -11,12 +11,17 @@ const api = withSessionRoute(async (req, res) => {
                     url: 'admin/login',
                     data: { username, password }
                 })
-                const { data: _data } = result
+                
                 req.session.auth = {
-					access_token: _data.accessToken
+					access_token: result.data.accessToken
                 }
                 await req.session.save()
-				res.status(200).send('logged in')
+
+
+				res.status(200).json({
+                    username: result.data.fullname, 
+                    role: result.data.role,
+                })
                 // return res.status(status).send({ message })
             } catch (error) {
 				console.log(error)

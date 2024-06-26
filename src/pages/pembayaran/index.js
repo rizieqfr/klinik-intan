@@ -68,13 +68,13 @@ export default function Pembayaran({accessToken}) {
                 <div>
                     {row.original.status === 'LUNAS' ? (
                         <td className='flex justify-center'>
-                            <button onClick={() => openModalEdit(row.original.id)} disabled className='bg-blue-300 text-white rounded px-[14px] py-[3px] font-semibold text-sm mr-2'>Edit Status</button>
-                            <Link href={`pembayaran/invoice/${row.original.id}`} className='bg-blue-600 text-white rounded px-[14px] py-[3px] font-semibold text-sm mr-2'>Cetak Invoice</Link>
+                            <button onClick={() => openModalEdit(row.original.idRekamMedis)} disabled className='bg-blue-300 text-white rounded px-[14px] py-[3px] font-semibold text-sm mr-2'>Edit Status</button>
+                            <Link href={`pembayaran/invoice/${row.original.idRekamMedis}`} className='bg-blue-600 text-white rounded px-[14px] py-[3px] font-semibold text-sm mr-2'>Cetak Invoice</Link>
                         </td>
                     ) : (
                         <td className='flex justify-center'>
-                            <button onClick={() => openModalEdit(row.original.id)} className='bg-blue-600  text-white rounded px-[14px] py-[3px] font-semibold text-sm mr-2'>Edit Status</button>
-                            <Link href={`pembayaran/invoice/${row.original.id}`} disabled className='bg-blue-300 text-white rounded px-[14px] py-[3px] font-semibold text-sm mr-2'>Cetak Invoice</Link>
+                            <button onClick={() => openModalEdit(row.original.idRekamMedis)} className='bg-blue-600  text-white rounded px-[14px] py-[3px] font-semibold text-sm mr-2'>Edit Status</button>
+                            <Link href={`pembayaran/invoice/${row.original.idRekamMedis}`} disabled className='bg-blue-300 text-white rounded px-[14px] py-[3px] font-semibold text-sm mr-2'>Cetak Invoice</Link>
                         </td>
                     )}
                 </div>
@@ -102,9 +102,9 @@ export default function Pembayaran({accessToken}) {
             
             return errors;
         },
-        onSubmit: (values) => {
+        onSubmit: async (values) => {
             try {
-                toast.promise(
+                await toast.promise(
                     ClientRequest.UpdateRekamMedis(accessToken, values, idPayment).then((res) => {
                         return res
                     }),
@@ -131,9 +131,9 @@ export default function Pembayaran({accessToken}) {
         setShowEditModal(!showEditModal)
         try {
             const res = await ClientRequest.GetRekamMedisById(accessToken, id)
-            console.log('resbyid', res)
-            const { statusPembayaran } = res.data.data;
-            formik.setValues({ statusPembayaran});
+            console.log('RES ID: ', res.data.data.transaction)
+            const { statusPembayaran } = res.data?.data?.transaction?.status
+            formik.setValues({ statusPembayaran });
         } catch (error) {
             console.log(error)
         }
@@ -143,7 +143,6 @@ export default function Pembayaran({accessToken}) {
     const getDataPayment = async () => {
         try {
             const res = await ClientRequest.GetPayment(accessToken)
-            console.log(res, 'response')
             setDataPayment(res.data.data)
         } catch (error) {
             console.log(error)
@@ -166,7 +165,7 @@ export default function Pembayaran({accessToken}) {
                             <h1 className='text-[#353A40] font-semibold'>Status</h1>
                         </div>
                         <div className='grid space-y-2 col-span-9'>
-                            <select onChange={(val) => formik.setFieldValue('statusPembayaran', val)} className='py-[13px] px-[16px] border rounded w-full' name="statusPembayaran" id="">
+                            <select onChange={formik.handleChange} value={formik.values.statusPembayaran} className='py-[13px] px-[16px] border rounded w-full' name="statusPembayaran" >
                                 <option value="">Select Status ...</option>
                                 <option value="LUNAS">Lunas</option>
                                 <option value="BELUM LUNAS">Belum Lunas</option>

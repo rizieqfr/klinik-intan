@@ -5,22 +5,24 @@ import ClientRequest from '@/utils/clientApiService'
 import routeGuard from '@/utils/routeGuard'
 import { withSession } from '@/utils/sessionWrapper'
 import { useFormik } from 'formik'
+import { debounce } from 'lodash'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import React, { useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
 import { FaCirclePlus } from 'react-icons/fa6'
 
-export default function RekamMedis({accessToken, dataPasien}) {
+export default function RekamMedis({accessToken, dataPasien, dataReservasi}) {
     const [showAddModal, setShowAddModal] = useState(false)
     const [showEditModal, setShowEditModal] = useState(false)
     const [idRekamMedis, setIdRekamMedis] = useState('')
+    const [reservasi, setReservasi] = useState([])
     
     const [dataRekamMedis, setDataRekamMedis] = useState('');
     const getRekamMedis = async () => {
         try {
             const res = await ClientRequest.GetRekamMedis(accessToken)
-            console.log(res)
+            console.log(res.data.data)
             setDataRekamMedis(res.data.data)
         } catch (error) {
             console.log(error)
@@ -64,9 +66,11 @@ export default function RekamMedis({accessToken, dataPasien}) {
     const formik = useFormik({
         initialValues:{
             patientId:'',
-            pelayanan:'',
-            keluhan:'',
+            idReservasi:'',
+            pelayanan:'',  // isinya jenis perawatan (IGD, Rawat Inap, dll)
+            keluhan:'', // isinya keluhan
             diagnosa:'',
+            kodeDiagnosa: '', // tambah body kode diagnosa, ini tipe data string dan required
             tindakan:'',
             biayaLayanan: '',
             biayaObat: '',
@@ -75,17 +79,11 @@ export default function RekamMedis({accessToken, dataPasien}) {
         validate:(values) => {
             const errors = {};
 
-            if (!values.patientId) {
-                errors.patientId = 'Pasien wajib diisi';
-            }
-            if (!values.pelayanan) {
-                errors.pelayanan = 'Jenis Pelayanan wajib diisi';
-            }
-            if (!values.keluhan) {
-                errors.keluhan = 'Keluhan wajib diisi';
-            }
             if (!values.diagnosa) {
                 errors.diagnosa = 'Diagnosa wajib diisi';
+            }
+            if (!values.kodeDiagnosa) {
+                errors.kodeDiagnosa = 'Kode Diagnosa wajib diisi';
             }
             if (!values.tindakan) {
                 errors.tindakan = 'Tindakan wajib diisi';
@@ -103,6 +101,7 @@ export default function RekamMedis({accessToken, dataPasien}) {
         return errors;
         },
         onSubmit: async (values) => {
+            console.log(values, 'value yang dikirim')
             try {
                 if (showAddModal === true) {
                     // Tambah Pasien
@@ -151,6 +150,23 @@ export default function RekamMedis({accessToken, dataPasien}) {
             }
         },
     })
+    const handleAutofill = (e) => {
+        console.log(e.target.value, 'handlechange')
+        debounceAutofill(e.target.value)
+      }
+    
+      const debounceAutofill = debounce(async (id) => {
+        try {
+          const res = await ClientRequest.GetReservasiById(accessToken, id)
+          console.log(res, 'res debounce')
+          formik.setFieldValue('keluhan', res.data.data.keluhan)
+          formik.setFieldValue('pelayanan', res.data.data.jenisPerawatan)
+          formik.setFieldValue('idReservasi', res.data.data.id)
+          formik.setFieldValue('patientId', res.data.data.patientId)
+        } catch (error) {
+          console.log(error)
+        }
+      }, 500)
 
     const openModalEdit = async (id) => {
         setIdRekamMedis(id)
@@ -167,6 +183,10 @@ export default function RekamMedis({accessToken, dataPasien}) {
     useEffect(() => {
         getRekamMedis()
     }, [])
+
+    useEffect(() => {
+        setReservasi(dataReservasi)
+    }, [dataReservasi])
   return (
     <div>
         <Modal 
@@ -179,31 +199,35 @@ export default function RekamMedis({accessToken, dataPasien}) {
                     <div className='grid grid-cols-12 gap-y-8'>
                         <div className='grid space-y-2 col-span-2 items-center text-[#353A40] font-semibold'>
                             <h1>Pasien</h1>
-                            <h1>Pelayanan</h1>
+                            <h1>Jenis Pelayanan</h1>
                             <h1>Keluhan</h1>
                             <h1>Diagnosa</h1>
+                            <h1>Kode Diagnosa</h1>
                             <h1>Tindakan</h1>
                             <h1>Biaya Pelayanan</h1>
                             <h1>Biaya Obat</h1>
                             <h1>Status Pembayaran</h1>
                         </div>
                         <div className='grid space-y-2 col-span-9'>
-                            <select onChange={(e) => formik.setFieldValue('patientId', e.target.value)} className='py-[13px] px-[16px] border rounded w-full outline-none' name="patientId" >
-                                <option value="">Pilih Pasien...</option>
-                                {Object.values(dataPasien).map((item,idx) => (
-                                    <option key={idx} value={item.id}>{item.fullname}</option>
+                            <select onChange={handleAutofill} className='py-[13px] px-[16px] border rounded w-full outline-none' name="patientId" >
+                                <option value="">Pilih Pasien dalam Antrian...</option>
+                                {Object.values(reservasi).map((item,idx) => (
+                                    <option key={idx} value={item.id}>Antrian {item.queue} - {item.fullname}</option>
                                 ))}
                             </select>
                             {formik.touched.patientId && formik.errors.patientId && <p className='text-xs font-medium text-red-600 ml-1'>*{formik.errors.patientId}</p>}
 
-                            <input type="text" className='py-[13px] px-[16px] border rounded w-full outline-none' onChange={formik.handleChange} name='pelayanan' placeholder='Jenis Pelayanan...'/>
+                            <input type="text" className='py-[13px] px-[16px] border rounded w-full outline-none cursor-not-allowed bg-slate-200' readOnly onChange={formik.handleChange} value={formik.values.pelayanan} name='pelayanan' placeholder='Jenis Pelayanan...'/>
                             {formik.touched.pelayanan && formik.errors.pelayanan && <p className='text-xs font-medium text-red-600 ml-1'>*{formik.errors.pelayanan}</p>}
 
-                            <input type="text" className='py-[13px] px-[16px] border rounded w-full outline-none' onChange={formik.handleChange} name='keluhan' placeholder='Keluhan...'/>
+                            <input type="text" className='py-[13px] px-[16px] border rounded w-full outline-none cursor-not-allowed bg-slate-200' onChange={formik.handleChange} value={formik.values.keluhan} readOnly name='keluhan' placeholder='Keluhan...'/>
                             {formik.touched.keluhan && formik.errors.keluhan && <p className='text-xs font-medium text-red-600 ml-1'>*{formik.errors.keluhan}</p>}
 
                             <input type="text" className='py-[13px] px-[16px] border rounded w-full outline-none' onChange={formik.handleChange} name='diagnosa' placeholder='Diagnosa...'/>
                             {formik.touched.diagnosa && formik.errors.diagnosa && <p className='text-xs font-medium text-red-600 ml-1'>*{formik.errors.diagnosa}</p>}
+
+                            <input type="text" className='py-[13px] px-[16px] border rounded w-full outline-none' onChange={formik.handleChange} name='kodeDiagnosa' placeholder='Kode Diagnosa...'/>
+                            {formik.touched.kodeDiagnosa && formik.errors.kodeDiagnosa && <p className='text-xs font-medium text-red-600 ml-1'>*{formik.errors.kodeDiagnosa}</p>}
 
                             <input type="text" className='py-[13px] px-[16px] border rounded w-full outline-none' onChange={formik.handleChange} name='tindakan' placeholder='Tindakan...'/>
                             {formik.touched.tindakan && formik.errors.tindakan && <p className='text-xs font-medium text-red-600 ml-1'>*{formik.errors.tindakan}</p>}
@@ -252,10 +276,10 @@ export default function RekamMedis({accessToken, dataPasien}) {
                             <h1>Status Pembayaran</h1>
                         </div>
                         <div className='grid space-y-2 col-span-9'>
-                            <select onChange={(e) => formik.setFieldValue('patientId', e.target.value)} className='py-[13px] px-[16px] border rounded w-full outline-none' name="patientId" id="">
+                            <select onChange={handleAutofill} className='py-[13px] px-[16px] border rounded w-full outline-none' name="patientId" id="">
                                 <option value="">Pilih Pasien...</option>
-                                {Object.values(dataPasien).map((item,idx) => (
-                                    <option value={item.id}>{item.fullname}</option>
+                                {Object.values(reservasi).map((item,idx) => (
+                                    <option value={item}>{item.fullname}</option>
                                 ))}
                             </select>
                             {formik.touched.patientId && formik.errors.patientId && <p className='text-xs font-medium text-red-600 ml-1'>*{formik.errors.patientId}</p>}
@@ -322,9 +346,14 @@ export default function RekamMedis({accessToken, dataPasien}) {
 export const getServerSideProps = withSession(async ({ req }) => {
 	const accessToken = req.session?.auth?.access_token
     const resPasien = await ClientRequest.GetPasien(accessToken)
+    const resReservasi = await ClientRequest.GetReservasi(accessToken)
 	const isLoggedIn = !!accessToken
 	const validator = [isLoggedIn]
 	return routeGuard(validator, '/auth/login', {
-		props: {accessToken: accessToken, dataPasien: resPasien.data.data}
+		props: {
+            accessToken: accessToken, 
+            dataPasien: resPasien.data.data,
+            dataReservasi: resReservasi.data.data,
+        }
 	})
 })

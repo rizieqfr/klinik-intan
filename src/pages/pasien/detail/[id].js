@@ -12,7 +12,7 @@ moment.locale('id');  // Set the locale to Indonesian
 export default function DetailPasien(data) {
     const route = useRouter()
     const dataRekamMedis = data.data.medical_records
-    console.log('data Pasien',data.data)
+    console.log(data, 'dataDetail')
     const kolomRM = [
         {
             header: 'No',
@@ -57,7 +57,7 @@ export default function DetailPasien(data) {
             </div>
             <div className='bg-white py-[39px] px-[32px] rounded-2xl'>
                 <h1 className='text-[24px] text-[#353A40] font-semibold mb-[32px]'>Detail Pasien {data.data.fullname}</h1>
-                <div className='flex items-start gap-[300px]'>
+                <div className='flex items-start gap-[50px]'>
                     <div className='space-y-[16px] font-semibold'>
                         <h1>Nomor Rekam Medis: <span className='text-slate-500 font-normal'>{data.data.no_rm}</span></h1>
                         <h1>NIK: <span className='text-slate-500 font-normal'>{data.data.nik}</span></h1>
@@ -69,6 +69,11 @@ export default function DetailPasien(data) {
                         <h1>Pekerjaan: <span className='text-slate-500 font-normal'>{data.data.work}</span></h1>
                         <h1>Telepon: <span className='text-slate-500 font-normal'>{data.data.phone}</span></h1>
                         <h1>Alamat: <span className='text-slate-500 font-normal'>{data.data.address}</span></h1>
+                    </div>
+                    <div className='space-y-[16px] font-semibold'>
+                        <h1>Alergi Obat: <span className='text-slate-500 font-normal'>{data.data.riwayatAlergiObat}</span></h1>
+                        <h1>Alergi Makanan: <span className='text-slate-500 font-normal'>{data.data.riwayatAlergiMakanan}</span></h1>
+                        <h1>Alergi Lainnya: <span className='text-slate-500 font-normal'>{data.data.riwayatAlergiLainya}</span></h1>
                     </div>
                 </div>
                 <hr className='border my-[32px]'/>

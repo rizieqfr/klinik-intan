@@ -63,6 +63,16 @@ class ClientRequest {
         })
     }
 
+    static Fetch(token) {
+        let path = `fetch`;
+        return request(`${this.urlAPI()}${path}`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        })
+    }
+
     // User Management
     static GetUserManagement(token, page, search, sorting) {
         let path = `user-management?page=${page}&search=${search}&sorting=${sorting}`;
@@ -229,19 +239,61 @@ class ClientRequest {
     }
 
     // Jadwal Dokter
-    static GetJadwalDokterPasien(token, keyword, page) {
-        let path = `transaction`;
+    static GetJadwalDokterAll(page, keyword, sorting, date) {
+        let path = `jadwal-dokter?page=${page}&search=${keyword}&sorting=${sorting}&date=${date}`;
         return request(`${this.urlAPI()}${path}`, {
             method: 'GET',
         })
     }
-    static GetJadwalDokterPasien(token, keyword, page) {
-        let path = `transaction`;
+    
+    static GetJadwalDokterAdmin(token, keyword, page, sorting) {
+        let path = `jadwal-dokter?page=${page}&search=${keyword}&sorting=${sorting}`;
         return request(`${this.urlAPI()}${path}`, {
             method: 'GET',
             headers: {
                 'Authorization': `Bearer ${token}`
             }
+        })
+    }
+    static GetJadwalDokterById(token, id) {
+        let path = `jadwal-dokter/${id}`;
+        return request(`${this.urlAPI()}${path}`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        })
+    }
+
+    static CreateJadwalDokter(token, data) {
+        let path = `jadwal-dokter`;
+        return request(`${this.urlAPI()}${path}`, {
+            method: 'POST',
+            data,
+            headers: {
+                'Authorization': `Bearer ${token}`,
+            },
+        })
+    }
+
+    static UpdateJadwalDokter(token, data, id) {
+        let path = `jadwal-dokter/${id}`;
+        return request(`${this.urlAPI()}${path}`, {
+            method: 'PUT',
+            data,
+            headers: {
+                'Authorization': `Bearer ${token}`,
+            },
+        })
+    }
+    
+    static DeleteRekamMedis(token, id) {
+        let path = `jadwal-dokter/${id}`;
+        return request(`${this.urlAPI()}${path}`, {
+            method: 'DELETE',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+            },
         })
     }
 
@@ -327,6 +379,37 @@ class ClientRequest {
             headers: {
                 'Authorization': `Bearer ${token}`,
             },
+        })
+    }
+
+    static CreateReservasi(token, data) {
+        let path = `reservation`;
+        return request(`${this.urlAPI()}${path}`, {
+            method: 'POST',
+            data,
+            headers: {
+                'Authorization': `Bearer ${token}`,
+            },
+        })
+    }
+
+    static GetReservasi(token, keyword) {
+        let path = `reservation`;
+        return request(`${this.urlAPI()}${path}`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        })
+    }
+
+    static GetReservasiById(token, id) {
+        let path = `reservation/${id}`;
+        return request(`${this.urlAPI()}${path}`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
         })
     }
 }

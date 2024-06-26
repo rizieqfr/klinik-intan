@@ -14,16 +14,16 @@ export default function Pelayanan() {
     const [idObat, setIdObat] = useState('')
     const kolomPelayanan = [
         {
+            header: 'Kode Obat',
             accessorKey: '',
-            header: 'Kode Obat'
         },
         {
+            header: 'Nama Obat',
             accessorKey: '',
-            header: 'Nama Obat'
         },
         {
+            header: 'Harga',
             accessorKey: '',
-            header: 'Harga'
         },
     ]
 

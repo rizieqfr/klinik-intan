@@ -42,6 +42,10 @@ export default function Pasien({accessToken}) {
             accessorKey: 'address',
         },
         {
+            header: 'Jenis Perawatan',
+            accessorKey: 'jenisPerawatan',
+        },
+        {
             accessorKey: 'id',
             header: () => <div></div>,
             cell: ({row}) => (
@@ -68,7 +72,7 @@ export default function Pasien({accessToken}) {
         address: '',
         work: '',
         phone: '',
-      };
+    };
 
     const formik = useFormik({
         initialValues,
@@ -148,7 +152,8 @@ export default function Pasien({accessToken}) {
 
     const getPasien = async () => {
         try {
-            const res = await ClientRequest.GetPasien(accessToken);;
+            const res = await ClientRequest.GetPasien(accessToken);
+            console.log(res.data, 'respasien')
             setData(res.data.data)
         } catch (error) {
             console.log(error);
@@ -215,13 +220,13 @@ export default function Pasien({accessToken}) {
                                 <h1>Jenis Kelamin</h1>
                                 <h1>Agama</h1>
                                 <h1>Status Perkawinan</h1>
-                                <h1>Riwayat Alergi Obat</h1>
-                                <h1>Riwayat Alergi Makanan</h1>
-                                <h1>Riwayat Alergi Lainnya</h1>
                                 <h1>Alamat</h1>
                                 <h1>Tanggal Lahir</h1>
                                 <h1>Telepon</h1>
                                 <h1>Pekerjaan</h1>
+                                <h1>Riwayat Alergi Obat</h1>
+                                <h1>Riwayat Alergi Makanan</h1>
+                                <h1>Riwayat Alergi Lainnya</h1>
                             </div>
                             <div className='grid space-y-2 col-span-8'>
                                 <input type="text" className='py-[13px] px-[16px] border rounded w-full outline-none' onChange={formik.handleChange} name='nik' placeholder='NIK...'/>
@@ -247,14 +252,6 @@ export default function Pasien({accessToken}) {
                                 </select>
                                 {formik.touched.statusPerkawinan && formik.errors.statusPerkawinan && <p className='text-xs font-medium text-red-600 ml-1'>*{formik.errors.statusPerkawinan}</p>}
 
-                                <input type="text" className='py-[13px] px-[16px] border rounded w-full outline-none' onChange={formik.handleChange} name='riwayatAlergiObat' placeholder='Riwayat Alergi Obat...'/>
-                                {formik.touched.riwayatAlergiObat && formik.errors.riwayatAlergiObat && <p className='text-xs font-medium text-red-600 ml-1'>*{formik.errors.riwayatAlergiObat}</p>}
-
-                                <input type="text" className='py-[13px] px-[16px] border rounded w-full outline-none' onChange={formik.handleChange} name='riwayatAlergiMakanan' placeholder='Riwayat Alergi Makanan...'/>
-                                {formik.touched.riwayatAlergiMakanan && formik.errors.riwayatAlergiMakanan && <p className='text-xs font-medium text-red-600 ml-1'>*{formik.errors.riwayatAlergiMakanan}</p>}
-
-                                <input type="text" className='py-[13px] px-[16px] border rounded w-full outline-none' onChange={formik.handleChange} name='riwayatAlergiLainya' placeholder='Riwayat Alergi Lainnya...'/>
-                                {formik.touched.riwayatAlergiLainya && formik.errors.riwayatAlergiLainya && <p className='text-xs font-medium text-red-600 ml-1'>*{formik.errors.riwayatAlergiLainya}</p>}
 
                                 <input type="text" className='py-[13px] px-[16px] border rounded w-full outline-none' onChange={formik.handleChange} name='address' placeholder='Alamat...'/>
                                 {formik.touched.address && formik.errors.address && <p className='text-xs font-medium text-red-600 ml-1'>*{formik.errors.address}</p>}
@@ -267,6 +264,15 @@ export default function Pasien({accessToken}) {
 
                                 <input type="text" className='py-[13px] px-[16px] border rounded w-full outline-none' onChange={formik.handleChange} name='work' placeholder='Pekerjaan...'/>
                                 {formik.touched.work && formik.errors.work && <p className='text-xs font-medium text-red-600 ml-1'>*{formik.errors.work}</p>}
+                                
+                                <input type="text" className='py-[13px] px-[16px] border rounded w-full outline-none' onChange={formik.handleChange} name='riwayatAlergiObat' placeholder='Riwayat Alergi Obat...'/>
+                                {formik.touched.riwayatAlergiObat && formik.errors.riwayatAlergiObat && <p className='text-xs font-medium text-red-600 ml-1'>*{formik.errors.riwayatAlergiObat}</p>}
+
+                                <input type="text" className='py-[13px] px-[16px] border rounded w-full outline-none' onChange={formik.handleChange} name='riwayatAlergiMakanan' placeholder='Riwayat Alergi Makanan...'/>
+                                {formik.touched.riwayatAlergiMakanan && formik.errors.riwayatAlergiMakanan && <p className='text-xs font-medium text-red-600 ml-1'>*{formik.errors.riwayatAlergiMakanan}</p>}
+
+                                <input type="text" className='py-[13px] px-[16px] border rounded w-full outline-none' onChange={formik.handleChange} name='riwayatAlergiLainya' placeholder='Riwayat Alergi Lainnya...'/>
+                                {formik.touched.riwayatAlergiLainya && formik.errors.riwayatAlergiLainya && <p className='text-xs font-medium text-red-600 ml-1'>*{formik.errors.riwayatAlergiLainya}</p>}
                             </div>
                         </div>
                         <div className='flex items-center justify-end gap-3'>
@@ -274,7 +280,7 @@ export default function Pasien({accessToken}) {
                             <button onClick={formik.handleSubmit} className='bg-[#0179FF] text-white font-semibold px-[33px] py-[15px] rounded'>Add</button>
                         </div>
                     </div>
-                    }
+                }
             />
             <Modal 
                 activeModal={showEditModal}
@@ -290,13 +296,13 @@ export default function Pasien({accessToken}) {
                             <h1>Jenis Kelamin</h1>
                             <h1>Agama</h1>
                             <h1>Status Perkawinan</h1>
-                            <h1>Riwayat Alergi Obat</h1>
-                            <h1>Riwayat Alergi Makanan</h1>
-                            <h1>Riwayat Alergi Lainnya</h1>
                             <h1>Alamat</h1>
                             <h1>Tanggal Lahir</h1>
                             <h1>Telepon</h1>
                             <h1>Pekerjaan</h1>
+                            <h1>Riwayat Alergi Obat</h1>
+                            <h1>Riwayat Alergi Makanan</h1>
+                            <h1>Riwayat Alergi Lainnya</h1>
                         </div>
                         <div className='grid space-y-2 col-span-8'>
 
@@ -323,14 +329,6 @@ export default function Pasien({accessToken}) {
                             </select>
                             {formik.touched.statusPerkawinan && formik.errors.statusPerkawinan && <p className='text-xs font-medium text-red-600 ml-1'>*{formik.errors.statusPerkawinan}</p>}
 
-                            <input type="text" className='py-[13px] px-[16px] border rounded w-full outline-none' onChange={formik.handleChange} value={formik.values.riwayatAlergiObat} name='riwayatAlergiObat' placeholder='Riwayat Alergi Obat...'/>
-                            {formik.touched.riwayatAlergiObat && formik.errors.riwayatAlergiObat && <p className='text-xs font-medium text-red-600 ml-1'>*{formik.errors.riwayatAlergiObat}</p>}
-
-                            <input type="text" className='py-[13px] px-[16px] border rounded w-full outline-none' onChange={formik.handleChange} value={formik.values.riwayatAlergiMakanan} name='riwayatAlergiMakanan' placeholder='Riwayat Alergi Makanan...'/>
-                            {formik.touched.riwayatAlergiMakanan && formik.errors.riwayatAlergiMakanan && <p className='text-xs font-medium text-red-600 ml-1'>*{formik.errors.riwayatAlergiMakanan}</p>}
-
-                            <input type="text" className='py-[13px] px-[16px] border rounded w-full outline-none' onChange={formik.handleChange} value={formik.values.riwayatAlergiLainya} name='riwayatAlergiLainya' placeholder='Riwayat Alergi Lainnya...'/>
-                            {formik.touched.riwayatAlergiLainya && formik.errors.riwayatAlergiLainya && <p className='text-xs font-medium text-red-600 ml-1'>*{formik.errors.riwayatAlergiLainya}</p>}
 
                             <input type="text" className='py-[13px] px-[16px] border rounded w-full outline-none' onChange={formik.handleChange} value={formik.values.address} name='address' placeholder='Alamat...'/>
                             {formik.touched.address && formik.errors.address && <p className='text-xs font-medium text-red-600 ml-1'>*{formik.errors.address}</p>}
@@ -343,6 +341,16 @@ export default function Pasien({accessToken}) {
 
                             <input type="text" className='py-[13px] px-[16px] border rounded w-full outline-none' onChange={formik.handleChange} value={formik.values.work} name='work' placeholder='Pekerjaan...'/>
                             {formik.touched.work && formik.errors.work && <p className='text-xs font-medium text-red-600 ml-1'>*{formik.errors.work}</p>}
+
+                            <input type="text" className='py-[13px] px-[16px] border rounded w-full outline-none' onChange={formik.handleChange} value={formik.values.riwayatAlergiObat} name='riwayatAlergiObat' placeholder='Riwayat Alergi Obat...'/>
+                            {formik.touched.riwayatAlergiObat && formik.errors.riwayatAlergiObat && <p className='text-xs font-medium text-red-600 ml-1'>*{formik.errors.riwayatAlergiObat}</p>}
+
+                            <input type="text" className='py-[13px] px-[16px] border rounded w-full outline-none' onChange={formik.handleChange} value={formik.values.riwayatAlergiMakanan} name='riwayatAlergiMakanan' placeholder='Riwayat Alergi Makanan...'/>
+                            {formik.touched.riwayatAlergiMakanan && formik.errors.riwayatAlergiMakanan && <p className='text-xs font-medium text-red-600 ml-1'>*{formik.errors.riwayatAlergiMakanan}</p>}
+
+                            <input type="text" className='py-[13px] px-[16px] border rounded w-full outline-none' onChange={formik.handleChange} value={formik.values.riwayatAlergiLainya} name='riwayatAlergiLainya' placeholder='Riwayat Alergi Lainnya...'/>
+                            {formik.touched.riwayatAlergiLainya && formik.errors.riwayatAlergiLainya && <p className='text-xs font-medium text-red-600 ml-1'>*{formik.errors.riwayatAlergiLainya}</p>}
+
                         </div>
                     </div>
                     <div className='flex items-center justify-end gap-3'>
@@ -350,7 +358,7 @@ export default function Pasien({accessToken}) {
                         <button onClick={formik.handleSubmit} className='bg-[#0179FF] text-white font-semibold px-[33px] py-[15px] rounded'>Save</button>
                     </div>
                 </div>
-                    }
+                }
             />
             <div className='bg-white flex gap-[32px] min-h-screen'>
                 <Sidebar />
