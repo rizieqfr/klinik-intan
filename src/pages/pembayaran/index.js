@@ -112,6 +112,7 @@ export default function Pembayaran({accessToken}) {
                         loading: 'Processing...',
                         success: (res) => {
                             formik.resetForm()
+                            getDataPayment()
                             setShowEditModal(!showEditModal)
                             console.log(res, 'sukses')
                         },
@@ -131,9 +132,8 @@ export default function Pembayaran({accessToken}) {
         setShowEditModal(!showEditModal)
         try {
             const res = await ClientRequest.GetRekamMedisById(accessToken, id)
-            console.log('RES ID: ', res.data.data.transaction)
-            const { statusPembayaran } = res.data?.data?.transaction?.status
-            formik.setValues({ statusPembayaran });
+            console.log('RES ID: ', res.data.data)
+            formik.setFieldValue('statusPembayaran', res.data.data.transaction.status)
         } catch (error) {
             console.log(error)
         }
@@ -144,6 +144,7 @@ export default function Pembayaran({accessToken}) {
         try {
             const res = await ClientRequest.GetPayment(accessToken)
             setDataPayment(res.data.data)
+            console.log(res.data.data)
         } catch (error) {
             console.log(error)
         }

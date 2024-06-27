@@ -30,7 +30,7 @@ export default function Pasien({accessToken}) {
             )
         },
         {
-            header: 'Nama',
+            header: 'Nama Pasien',
             accessorKey: 'fullname',
         },
         {

@@ -40,6 +40,7 @@ export default function DetailPasien(data) {
                         <h1>Keluhan: <span className='text-slate-500 font-normal'>{data.data.keluhan}</span></h1>
                         <h1>Pelayanan: <span className='text-slate-500 font-normal'>{data.data.pelayanan}</span></h1>
                         <h1>Diagnosa: <span className='text-slate-500 font-normal'>{data.data.diagnosa}</span></h1>
+                        <h1>Kode Diagnosa: <span className='text-slate-500 font-normal'>{data.data.kode_diagnosa}</span></h1>
                         <h1>Tindakan: <span className='text-slate-500 font-normal'>{ data.data.tindakan}</span></h1>
                     </div>
                 {/* </div> */}

@@ -183,7 +183,7 @@ export default function PasienLama() {
                             <p>{dataReservasi?.dataPatient?.address || '-'}</p>
                             <p>{moment(dataReservasi?.date).format('DD-MM-YYYY') || '-'}</p>
                             {/* <p>Senin, 25 Juni 2024 / 10.24 WIB</p> */}
-                            <p>Dr. Rizieq, Poli Umum</p>
+                            <p>{dataReservasi?.jadwalDokter?.namaDokter}, Poli {dataReservasi?.jadwalDokter?.poli}</p>
                             <p>{dataReservasi?.jenisPerawatan || '-'}</p>
                             <p>{dataReservasi?.keluhan || '-'}</p>
                         </div>

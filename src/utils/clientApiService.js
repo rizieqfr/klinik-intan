@@ -310,7 +310,7 @@ class ClientRequest {
     }
 
     static GetPaymentById(token, id) {
-        let path = `invoice?invoiceId=${id}`;
+        let path = `transaction?invoiceId${id}`;
         return request(`${this.urlAPI()}${path}`, {
             method: 'GET',
             headers: {

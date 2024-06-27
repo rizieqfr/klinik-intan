@@ -22,7 +22,7 @@ export default function RekamMedis({accessToken, dataPasien, dataReservasi}) {
     const getRekamMedis = async () => {
         try {
             const res = await ClientRequest.GetRekamMedis(accessToken)
-            console.log(res.data.data)
+            console.log('Get Rekam Medis: ',res.data.data)
             setDataRekamMedis(res.data.data)
         } catch (error) {
             console.log(error)
@@ -56,8 +56,8 @@ export default function RekamMedis({accessToken, dataPasien, dataReservasi}) {
             cell: ({row}) => (
                 <td className='flex justify-center'>
                     <Link href={`rekam-medis/detail/${row.original.id}`}  className='bg-[#0080CC] text-white rounded px-[14px] py-[3px] font-semibold text-sm mr-2'>Detail</Link>
-                    <button onClick={() => openModalEdit(row.original.id)} className='bg-[#FEC107] text-white rounded px-[14px] py-[3px] font-semibold text-sm mr-2'>Edit</button>
-                    <button className='bg-[#FF0000] text-white rounded px-[14px] py-[3px] font-semibold text-sm'>Hapus</button>
+                    {/* <button onClick={() => openModalEdit(row.original.id)} className='bg-[#FEC107] text-white rounded px-[14px] py-[3px] font-semibold text-sm mr-2'>Edit</button> */}
+                    {/* <button className='bg-[#FF0000] text-white rounded px-[14px] py-[3px] font-semibold text-sm'>Hapus</button> */}
                 </td>
             )
         
@@ -97,6 +97,8 @@ export default function RekamMedis({accessToken, dataPasien, dataReservasi}) {
             if (!values.biayaObat) {
                 errors.biayaObat = 'Biaya Obat wajib diisi';
             }
+
+            console.log(errors)
 
         return errors;
         },
@@ -163,6 +165,7 @@ export default function RekamMedis({accessToken, dataPasien, dataReservasi}) {
           formik.setFieldValue('pelayanan', res.data.data.jenisPerawatan)
           formik.setFieldValue('idReservasi', res.data.data.id)
           formik.setFieldValue('patientId', res.data.data.patientId)
+          formik.setFieldValue('diagnosa', res.data.data.kode_diagnosa)
         } catch (error) {
           console.log(error)
         }
@@ -251,7 +254,7 @@ export default function RekamMedis({accessToken, dataPasien, dataReservasi}) {
 
                     <div className='flex items-center justify-end gap-3'>
                         <button onClick={() => setShowAddModal(!showAddModal)} className='border-[#0179FF] border text-[#0179FF] font-semibold px-[33px] py-[15px] rounded'>Cancel</button>
-                        <button onClick={formik.handleSubmit} className='bg-[#0179FF] text-white font-semibold px-[33px] py-[15px] rounded'>Add</button>
+                        <button type='submit' onClick={formik.handleSubmit} className='bg-[#0179FF] text-white font-semibold px-[33px] py-[15px] rounded'>Add</button>
                     </div>
 
                 </div>
@@ -270,16 +273,17 @@ export default function RekamMedis({accessToken, dataPasien, dataReservasi}) {
                             <h1>Pelayanan</h1>
                             <h1>Keluhan</h1>
                             <h1>Diagnosa</h1>
+                            <h1>Kode Diagnosa</h1>
                             <h1>Tindakan</h1>
                             <h1>Biaya Pelayanan</h1>
                             <h1>Biaya Obat</h1>
                             <h1>Status Pembayaran</h1>
                         </div>
                         <div className='grid space-y-2 col-span-9'>
-                            <select onChange={handleAutofill} className='py-[13px] px-[16px] border rounded w-full outline-none' name="patientId" id="">
-                                <option value="">Pilih Pasien...</option>
+                            <select onChange={handleAutofill} className='py-[13px] px-[16px] border rounded w-full outline-none' name="patientId" >
+                                <option value="">Pilih Pasien dalam Antrian...</option>
                                 {Object.values(reservasi).map((item,idx) => (
-                                    <option value={item}>{item.fullname}</option>
+                                    <option key={idx} value={item.id}>Antrian {item.queue} - {item.fullname}</option>
                                 ))}
                             </select>
                             {formik.touched.patientId && formik.errors.patientId && <p className='text-xs font-medium text-red-600 ml-1'>*{formik.errors.patientId}</p>}
@@ -292,6 +296,10 @@ export default function RekamMedis({accessToken, dataPasien, dataReservasi}) {
 
                             <input type="text" className='py-[13px] px-[16px] border rounded w-full outline-none' onChange={formik.handleChange} value={formik.values.diagnosa} name='diagnosa' placeholder='Diagnosa...'/>
                             {formik.touched.diagnosa && formik.errors.diagnosa && <p className='text-xs font-medium text-red-600 ml-1'>*{formik.errors.diagnosa}</p>}
+
+                            <input type="text" className='py-[13px] px-[16px] border rounded w-full outline-none' onChange={formik.handleChange} name='kodeDiagnosa' placeholder='Kode Diagnosa...'/>
+                            {formik.touched.kodeDiagnosa && formik.errors.kodeDiagnosa && <p className='text-xs font-medium text-red-600 ml-1'>*{formik.errors.kodeDiagnosa}</p>}
+
 
                             <input type="text" className='py-[13px] px-[16px] border rounded w-full outline-none' onChange={formik.handleChange} value={formik.values.tindakan} name='tindakan' placeholder='Tindakan...'/>
                             {formik.touched.tindakan && formik.errors.tindakan && <p className='text-xs font-medium text-red-600 ml-1'>*{formik.errors.tindakan}</p>}

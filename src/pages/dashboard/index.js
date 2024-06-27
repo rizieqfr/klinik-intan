@@ -57,7 +57,7 @@ export default function Dashboard({dataDashboard}) {
                     <div className='px-[24px] py-[28px] bg-[#DC3546] text-white rounded-t-lg'>
                         <div className='flex items-center justify-between'>
                             <div>
-                                <h1 className='text-4xl font-bold mb-2'>{dataDashboard.amount_service}</h1>
+                                <h1 className='text-4xl font-bold mb-2'>{dataDashboard.amountReservation}</h1>
                                 <h1 className='text-xl font-semibold'>Total Pelayanan</h1>
                             </div>
                             <MdMedicalServices className='text-4xl' />
