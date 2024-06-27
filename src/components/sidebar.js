@@ -8,6 +8,7 @@ import toast from 'react-hot-toast';
 import { withSession } from '@/utils/sessionWrapper';
 import routeGuard from '@/utils/routeGuard';
 import axios from 'axios';
+import { IoDocumentsSharp } from 'react-icons/io5';
 
 export default function Sidebar({user}) {
     const router = useRouter()
@@ -73,6 +74,10 @@ export default function Sidebar({user}) {
             <button onClick={() => router.push('/pembayaran')} className={`${router.pathname === '/pembayaran' && 'bg-[#0179FF]'} hover:bg-[#0179FF] py-[8px] px-[37px] text-white font-semibold w-full flex items-center gap-2`}>
                 <MdPayments   />
                 <h1 className='text-start'>Pembayaran</h1>
+            </button>
+            <button onClick={() => router.push('/pelaporan')} className={`${router.pathname === '/pelaporan' && 'bg-[#0179FF]'} hover:bg-[#0179FF] py-[8px] px-[37px] text-white font-semibold w-full flex items-center gap-2`}>
+                <IoDocumentsSharp    />
+                <h1 className='text-start'>Pelaporan</h1>
             </button>
             <button onClick={() => router.push('/user-management')} className={`${router.pathname === '/user-management' && 'bg-[#0179FF]'} hover:bg-[#0179FF] py-[8px] px-[37px] text-white font-semibold w-full flex items-center gap-2`}>
                 <FaUserGear />
