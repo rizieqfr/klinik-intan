@@ -54,8 +54,8 @@ export default function Login() {
 
 
   return (
-    <div className='min-h-screen'>
-        <div className='mx-[299px] my-[30px] bg-white border rounded-lg px-[43px] py-[100px] shadow '>
+    <div className='min-h-screen bg-[#00A9AE] px-[299px] py-[30px]'>
+        <div className=' bg-white border rounded-lg px-[43px] py-[100px] shadow '>
             <h1 className='text-[46px] text-center mb-[24px] font-bold'>Admin Nur Hidayah Klinik</h1>
             <h2 className='text-center mb-[42px] text-[#353A4099]'>Hello! Please login to start your session!</h2>
                 <div className='flex items-center justify-center'>

@@ -2,7 +2,7 @@ import { useRouter } from 'next/router'
 import { FaBookMedical, FaHandHoldingMedical, FaUserDoctor, FaUserGear } from "react-icons/fa6";
 import { FaHome } from "react-icons/fa";
 import React, { useEffect, useState } from 'react'
-import { MdPayments, MdRsvp } from "react-icons/md";
+import { MdAssignmentInd, MdPayments, MdRsvp } from "react-icons/md";
 import { RiAdminFill, RiLogoutBoxFill } from "react-icons/ri";
 import toast from 'react-hot-toast';
 import { withSession } from '@/utils/sessionWrapper';
@@ -41,10 +41,12 @@ export default function Sidebar({user}) {
             <div className='w-[46px] h-[46px] rounded-full bg-slate-300 flex items-center justify-center'>
                 <RiAdminFill className='text-black text-xl' />
             </div>
-            <div className=''>
-                {/* <h1>Username: {localStorage.getItem('username') !== null ? localStorage.getItem('username') : '-' } </h1>
-                <h1>Role: {localStorage.getItem('role') !== null ? localStorage.getItem('role') : '-' } </h1> */}
-            </div>
+            {/* {localStorage.getItem('username') && localStorage.getItem('role') && (
+                <div className=''>
+                    <h1>Username: {localStorage.getItem('username')} </h1>
+                    <h1>Role: {localStorage.getItem('role')} </h1>
+                </div>
+            )} */}
         </div>
         <div className='space-y-[8px]'>
             <button onClick={() => router.push('/dashboard')} className={`${router.pathname === '/dashboard' && 'bg-[#0179FF]'} hover:bg-[#0179FF] py-[8px] px-[37px] text-white font-semibold w-full flex items-center gap-2`}>
@@ -57,7 +59,7 @@ export default function Sidebar({user}) {
             </button>
             <button onClick={() => router.push('/dokter')} className={`${router.pathname === '/dokter' && 'bg-[#0179FF]'} hover:bg-[#0179FF] py-[8px] px-[37px] text-white font-semibold w-full flex items-center gap-2`}>
                 <FaUserDoctor  />
-                <h1 className='text-start'>Jadwal Dokter</h1>
+                <h1 className='text-start'>Dokter</h1>
             </button>
             <button onClick={() => router.push('/rekam-medis')} className={`${router.pathname === '/rekam-medis' && 'bg-[#0179FF]'} hover:bg-[#0179FF] py-[8px] px-[37px] text-white font-semibold w-full flex items-center gap-2`}>
                 <FaBookMedical />
@@ -69,7 +71,11 @@ export default function Sidebar({user}) {
             </button> */}
             <button onClick={() => router.push('/reservasi')} className={`${router.pathname === '/reservasi' && 'bg-[#0179FF]'} hover:bg-[#0179FF] py-[8px] px-[37px] text-white font-semibold w-full flex items-center gap-2`}>
                 <MdRsvp     />
-                <h1 className='text-start'>Reservasi</h1>
+                <h1 className='text-start'>Antrian</h1>
+            </button>
+            <button onClick={() => router.push('/pendaftaran')} className={`${router.pathname === '/pendaftaran' && 'bg-[#0179FF]'} hover:bg-[#0179FF] py-[8px] px-[37px] text-white font-semibold w-full flex items-center gap-2`}>
+                <MdAssignmentInd      />
+                <h1 className='text-start'>Pendaftaran</h1>
             </button>
             <button onClick={() => router.push('/pembayaran')} className={`${router.pathname === '/pembayaran' && 'bg-[#0179FF]'} hover:bg-[#0179FF] py-[8px] px-[37px] text-white font-semibold w-full flex items-center gap-2`}>
                 <MdPayments   />
@@ -84,7 +90,7 @@ export default function Sidebar({user}) {
                 <h1 className='text-start'>User</h1>
             </button>
         </div>
-        <button onClick={Logout} className='hover:bg-[#0179FF] py-[8px] px-[37px] text-white font-semibold w-full flex items-center gap-2 mt-48 '>
+        <button onClick={Logout} className='hover:bg-[#0179FF] py-[8px] px-[37px] text-white font-semibold w-full flex items-center gap-2 mt-20 '>
             <RiLogoutBoxFill />
             <h1 className='text-start'>Log Out</h1>
         </button>
@@ -94,7 +100,6 @@ export default function Sidebar({user}) {
 
 export const getServerSideProps = withSession(async ({ req }) => {
 	const accessToken = req.session?.auth?.access_token
-    console.log(req.session.user, 'req')
 	const validator = [isLoggedIn]
 	return routeGuard(validator, '/auth/login', {
 		props: {user: req.session.user}

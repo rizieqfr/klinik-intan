@@ -174,6 +174,7 @@ export default function Reservasi({accessToken}) {
                             <h1>:</h1>
                             <h1>:</h1>
                             <h1>:</h1>
+                            <h1>:</h1>
                         </div>
                         <div className='grid space-y-2 col-span-9 items-center'>
                             <div>
@@ -223,13 +224,13 @@ export default function Reservasi({accessToken}) {
                 <Sidebar />
                 <div className='w-full pb-10 pr-[32px]'>
                     <div className='flex items-start justify-between  pt-[40px] mb-4'>
-                        <h1 className='text-4xl text-[#353A40] font-bold'>Reservasi</h1>
-                        <h1>Navigasi / <span className='text-cyan font-medium'>Reservasi</span></h1>
+                        <h1 className='text-4xl text-[#353A40] font-bold'>Antrian Reservasi</h1>
+                        <h1>Navigasi / <span className='text-cyan font-medium'>Antrian Reservasi</span></h1>
                     </div>
                     <div className='flex items-center justify-end '>
                         <button onClick={() => setShowAddModal(!showAddModal)} className='flex items-center justify-center gap-3 py-[14px] bg-[#0179FF] px-[30px] rounded text-white font-medium'>
                             <FaCirclePlus className='text-xl' />
-                            <h1>Daftar Pasien</h1>
+                            <h1>Reservasi Baru</h1>
                         </button>
                     </div>
                     <Table data={dataReservasi} columns={kolomReservasi} />

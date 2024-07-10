@@ -17,6 +17,8 @@ export default function RekamMedis({accessToken, dataPasien, dataReservasi}) {
     const [showEditModal, setShowEditModal] = useState(false)
     const [idRekamMedis, setIdRekamMedis] = useState('')
     const [reservasi, setReservasi] = useState([])
+
+    console.log(reservasi, 'datapasienreservasi')
     
     const [dataRekamMedis, setDataRekamMedis] = useState('');
     const getRekamMedis = async () => {
@@ -52,11 +54,11 @@ export default function RekamMedis({accessToken, dataPasien, dataReservasi}) {
         },
         {
             accessorKey: 'id',
-            header: () => <div>Action</div>,
+            header: () => <div className='text-center'>Action</div>,
             cell: ({row}) => (
                 <td className='flex justify-center'>
                     <Link href={`rekam-medis/detail/${row.original.id}`}  className='bg-[#0080CC] text-white rounded px-[14px] py-[3px] font-semibold text-sm mr-2'>Detail</Link>
-                    {/* <button onClick={() => openModalEdit(row.original.id)} className='bg-[#FEC107] text-white rounded px-[14px] py-[3px] font-semibold text-sm mr-2'>Edit</button> */}
+                    <button onClick={() => openModalEdit(row.original.id)} className='bg-[#FEC107] text-white rounded px-[14px] py-[3px] font-semibold text-sm mr-2'>Edit</button>
                     {/* <button className='bg-[#FF0000] text-white rounded px-[14px] py-[3px] font-semibold text-sm'>Hapus</button> */}
                 </td>
             )
@@ -72,9 +74,9 @@ export default function RekamMedis({accessToken, dataPasien, dataReservasi}) {
             diagnosa:'',
             kodeDiagnosa: '', // tambah body kode diagnosa, ini tipe data string dan required
             tindakan:'',
-            biayaLayanan: '',
-            biayaObat: '',
-            statusPembayaran: ''
+            biayaLayanan: 0,
+            biayaObat: 0,
+            statusPembayaran: 'BELUM LUNAS'
         },
         validate:(values) => {
             const errors = {};
@@ -88,16 +90,6 @@ export default function RekamMedis({accessToken, dataPasien, dataReservasi}) {
             if (!values.tindakan) {
                 errors.tindakan = 'Tindakan wajib diisi';
             }
-            if (!values.statusPembayaran) {
-                errors.statusPembayaran = 'Status Pembayaran wajib diisi';
-            }
-            if (!values.biayaLayanan) {
-                errors.biayaLayanan = 'Biaya Pelayanan wajib diisi';
-            }
-            if (!values.biayaObat) {
-                errors.biayaObat = 'Biaya Obat wajib diisi';
-            }
-
             console.log(errors)
 
         return errors;
@@ -176,8 +168,12 @@ export default function RekamMedis({accessToken, dataPasien, dataReservasi}) {
         setShowEditModal(!showEditModal)
         try {
             const res = await ClientRequest.GetRekamMedisById(accessToken, id)
-            const {patientId, pelayanan, keluhan, diagnosa, tindakan, biayaLayanan, biayaObat, statusPembayaran } = res.data.data;
-            formik.setValues({ patientId, pelayanan, keluhan, diagnosa, tindakan, biayaLayanan, biayaObat, statusPembayaran});
+            const {patientId, pelayanan, keluhan, diagnosa, tindakan } = res.data.data;
+            formik.setValues({ patientId, pelayanan, keluhan, diagnosa, tindakan});
+            formik.setFieldValue('biayaLayanan', res.data.data.purchased.biayaLayanan)
+            formik.setFieldValue('biayaObat', res.data.data.purchased.biayaObat)
+            formik.setFieldValue('statusPembayaran', res.data.data.status)
+            formik.setFieldValue('kodeDiagnosa', res.data.data.kode_diagnosa)
         } catch (error) {
             console.log(error)
         }
@@ -207,16 +203,25 @@ export default function RekamMedis({accessToken, dataPasien, dataReservasi}) {
                             <h1>Diagnosa</h1>
                             <h1>Kode Diagnosa</h1>
                             <h1>Tindakan</h1>
-                            <h1>Biaya Pelayanan</h1>
-                            <h1>Biaya Obat</h1>
-                            <h1>Status Pembayaran</h1>
                         </div>
                         <div className='grid space-y-2 col-span-9'>
                             <select onChange={handleAutofill} className='py-[13px] px-[16px] border rounded w-full outline-none' name="patientId" >
                                 <option value="">Pilih Pasien dalam Antrian...</option>
-                                {Object.values(reservasi).map((item,idx) => (
-                                    <option key={idx} value={item.id}>Antrian {item.queue} - {item.fullname}</option>
-                                ))}
+                                {Object.values(reservasi).filter(item => item.statusPeriksa === false).length > 0 ? (
+                                    <>
+                                        <option value="">Pilih Pasien dalam Antrian...</option>
+                                        {Object.values(reservasi)
+                                            .filter(item => item.statusPeriksa === false)
+                                            .map((item, idx) => (
+                                                <option key={idx} value={item.id}>
+                                                    Antrian {item.queue} - {item.fullname}
+                                                </option>
+                                            ))
+                                        }
+                                    </>
+                                ) : (
+                                    <option value="">Tidak ada pasien dalam antrian</option>
+                                )}
                             </select>
                             {formik.touched.patientId && formik.errors.patientId && <p className='text-xs font-medium text-red-600 ml-1'>*{formik.errors.patientId}</p>}
 
@@ -234,19 +239,6 @@ export default function RekamMedis({accessToken, dataPasien, dataReservasi}) {
 
                             <input type="text" className='py-[13px] px-[16px] border rounded w-full outline-none' onChange={formik.handleChange} name='tindakan' placeholder='Tindakan...'/>
                             {formik.touched.tindakan && formik.errors.tindakan && <p className='text-xs font-medium text-red-600 ml-1'>*{formik.errors.tindakan}</p>}
-
-                            <input type="number" className='py-[13px] px-[16px] border rounded w-full outline-none' onChange={formik.handleChange} name='biayaLayanan' placeholder='Biaya Pelayanan (Rp.) ...'/>
-                            {formik.touched.biayaLayanan && formik.errors.biayaLayanan && <p className='text-xs font-medium text-red-600 ml-1'>*{formik.errors.biayaLayanan}</p>}
-
-                            <input type="number" className='py-[13px] px-[16px] border rounded w-full outline-none' onChange={formik.handleChange} name='biayaObat' placeholder='Biaya Obat (Rp.) ...'/>
-                            {formik.touched.biayaObat && formik.errors.biayaObat && <p className='text-xs font-medium text-red-600 ml-1'>*{formik.errors.biayaObat}</p>}
-
-                            <select name="statusPembayaran" onChange={(e) => formik.setFieldValue('statusPembayaran', e.target.value)} className='py-[13px] px-[16px] border rounded w-full outline-none'>
-                                <option value="">Select Status Pembayaran</option>
-                                <option value="BELUM LUNAS">Belum Lunas</option>
-                                <option value="LUNAS">Lunas</option>
-                            </select>
-                            {formik.touched.statusPembayaran && formik.errors.statusPembayaran && <p className='text-xs font-medium text-red-600 ml-1'>*{formik.errors.statusPembayaran}</p>}
                             
 
                         </div>
@@ -275,9 +267,6 @@ export default function RekamMedis({accessToken, dataPasien, dataReservasi}) {
                             <h1>Diagnosa</h1>
                             <h1>Kode Diagnosa</h1>
                             <h1>Tindakan</h1>
-                            <h1>Biaya Pelayanan</h1>
-                            <h1>Biaya Obat</h1>
-                            <h1>Status Pembayaran</h1>
                         </div>
                         <div className='grid space-y-2 col-span-9'>
                             <select onChange={handleAutofill} className='py-[13px] px-[16px] border rounded w-full outline-none' name="patientId" >
@@ -297,25 +286,11 @@ export default function RekamMedis({accessToken, dataPasien, dataReservasi}) {
                             <input type="text" className='py-[13px] px-[16px] border rounded w-full outline-none' onChange={formik.handleChange} value={formik.values.diagnosa} name='diagnosa' placeholder='Diagnosa...'/>
                             {formik.touched.diagnosa && formik.errors.diagnosa && <p className='text-xs font-medium text-red-600 ml-1'>*{formik.errors.diagnosa}</p>}
 
-                            <input type="text" className='py-[13px] px-[16px] border rounded w-full outline-none' onChange={formik.handleChange} name='kodeDiagnosa' placeholder='Kode Diagnosa...'/>
+                            <input type="text" className='py-[13px] px-[16px] border rounded w-full outline-none' onChange={formik.handleChange} value={formik.values.kodeDiagnosa} name='kodeDiagnosa' placeholder='Kode Diagnosa...'/>
                             {formik.touched.kodeDiagnosa && formik.errors.kodeDiagnosa && <p className='text-xs font-medium text-red-600 ml-1'>*{formik.errors.kodeDiagnosa}</p>}
-
 
                             <input type="text" className='py-[13px] px-[16px] border rounded w-full outline-none' onChange={formik.handleChange} value={formik.values.tindakan} name='tindakan' placeholder='Tindakan...'/>
                             {formik.touched.tindakan && formik.errors.tindakan && <p className='text-xs font-medium text-red-600 ml-1'>*{formik.errors.tindakan}</p>}
-
-                            <input type="number" className='py-[13px] px-[16px] border rounded w-full outline-none' onChange={formik.handleChange} value={formik.values.biayaLayanan} name='biayaLayanan' placeholder='Biaya Pelayanan (Rp.) ...'/>
-                            {formik.touched.biayaLayanan && formik.errors.biayaLayanan && <p className='text-xs font-medium text-red-600 ml-1'>*{formik.errors.biayaLayanan}</p>}
-
-                            <input type="number" className='py-[13px] px-[16px] border rounded w-full outline-none' onChange={formik.handleChange} value={formik.values.biayaObat} name='biayaObat' placeholder='Biaya Obat (Rp.) ...'/>
-                            {formik.touched.biayaObat && formik.errors.biayaObat && <p className='text-xs font-medium text-red-600 ml-1'>*{formik.errors.biayaObat}</p>}
-
-                            <select name="statusPembayaran" onChange={(e) => formik.setFieldValue('statusPembayaran', e.target.value)} className='py-[13px] px-[16px] border rounded w-full outline-none'>
-                                <option value="">Select Status Pembayaran</option>
-                                <option value="BELUM LUNAS">Belum Lunas</option>
-                                <option value="LUNAS">Lunas</option>
-                            </select>
-                            {formik.touched.statusPembayaran && formik.errors.statusPembayaran && <p className='text-xs font-medium text-red-600 ml-1'>*{formik.errors.statusPembayaran}</p>}
 
                         </div>
                     </div>

@@ -90,6 +90,8 @@ export default function Pembayaran({accessToken}) {
         validate:(values) => {
             const requiredFields = [
                 "statusPembayaran",
+                "biayaObat",
+                "biayaLayanan",
             ];
             const errors = Object.fromEntries(
                 requiredFields
@@ -132,8 +134,9 @@ export default function Pembayaran({accessToken}) {
         setShowEditModal(!showEditModal)
         try {
             const res = await ClientRequest.GetRekamMedisById(accessToken, id)
-            console.log('RES ID: ', res.data.data)
-            formik.setFieldValue('statusPembayaran', res.data.data.transaction.status)
+            formik.setFieldValue('statusPembayaran', res.data.data.status)
+            formik.setFieldValue('biayaLayanan', res.data.data.purchased.biayaLayanan)
+            formik.setFieldValue('biayaObat', res.data.data.purchased.biayaObat)
         } catch (error) {
             console.log(error)
         }
@@ -163,15 +166,27 @@ export default function Pembayaran({accessToken}) {
                 <div className=' w-full space-y-[12px]'>
                     <div className='grid grid-cols-12 gap-y-8'>
                         <div className='grid space-y-2 col-span-2 items-center'>
+                            <h1 className='text-[#353A40] font-semibold'>Biaya Obat</h1>
+                            <h1 className='text-[#353A40] font-semibold'>Biaya Layanan</h1>
                             <h1 className='text-[#353A40] font-semibold'>Status</h1>
                         </div>
                         <div className='grid space-y-2 col-span-9'>
-                            <select onChange={formik.handleChange} value={formik.values.statusPembayaran} className='py-[13px] px-[16px] border rounded w-full' name="statusPembayaran" >
-                                <option value="">Select Status ...</option>
-                                <option value="LUNAS">Lunas</option>
-                                <option value="BELUM LUNAS">Belum Lunas</option>
-                            </select>
-                            {formik.touched.statusPembayaran && formik.errors.statusPembayaran && <p className='text-xs font-medium text-red-600 ml-1'>*{formik.errors.statusPembayaran}</p>}
+                            <div>
+                                <input type="number" className='py-[13px] px-[16px] border rounded w-full outline-none' onChange={formik.handleChange} value={formik.values.biayaLayanan} name='biayaLayanan' placeholder='Biaya Pelayanan (Rp.) ...'/>
+                                {formik.touched.biayaLayanan && formik.errors.biayaLayanan && <p className='text-xs font-medium text-red-600 ml-1'>*{formik.errors.biayaLayanan}</p>}
+                            </div>
+                            <div>  
+                                <input type="number" className='py-[13px] px-[16px] border rounded w-full outline-none' onChange={formik.handleChange} value={formik.values.biayaObat} name='biayaObat' placeholder='Biaya Obat (Rp.) ...'/>
+                                {formik.touched.biayaObat && formik.errors.biayaObat && <p className='text-xs font-medium text-red-600 ml-1'>*{formik.errors.biayaObat}</p>}
+                            </div>
+                            <div>
+                                <select onChange={formik.handleChange} value={formik.values.statusPembayaran} className='py-[13px] px-[16px] border rounded w-full' name="statusPembayaran" >
+                                    <option value="">Select Status ...</option>
+                                    <option value="LUNAS">Lunas</option>
+                                    <option value="BELUM LUNAS">Belum Lunas</option>
+                                </select>
+                                {formik.touched.statusPembayaran && formik.errors.statusPembayaran && <p className='text-xs font-medium text-red-600 ml-1'>*{formik.errors.statusPembayaran}</p>}
+                            </div>
                         </div>
                     </div>
                     <div className='flex items-center justify-end gap-3'>
