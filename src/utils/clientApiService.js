@@ -4,7 +4,7 @@ import request from "./requestClient";
 class ClientRequest {
 
     static urlAPI() {
-        return process.env.NEXT_BACKEND_API_URL
+        return process.env.NEXT_BACKEND_API_URL || 'https://apiklinikintan.soemantry.com/';
     }
 
     // Begin :: Auth
