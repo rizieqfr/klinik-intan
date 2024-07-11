@@ -4,8 +4,7 @@ import request from "./requestClient";
 class ClientRequest {
 
     static urlAPI() {
-        // return process.env.REACT_APP_BACKEND_URL
-        return 'http://localhost:5005/'
+        return process.env.NEXT_BACKEND_API_URL
     }
 
     // Begin :: Auth
