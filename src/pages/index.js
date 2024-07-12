@@ -5,6 +5,7 @@ import { useRouter } from "next/router";
 import axios from "axios";
 import toast from "react-hot-toast";
 import apiService from "@/utils/apiService";
+import ClientRequest from "@/utils/clientApiService";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -21,22 +22,40 @@ export default function Home() {
       work: '',
     },
     onSubmit: async (values) => {
-      return toast.promise(
-        apiService.request({
-          method: 'POST',
-          url: 'register-patient',
-          data: values
-        }),
-        {
-          loading: 'Sedang melakukan pendaftaran...',
-          success: () => toast.success('Berhasil Register'),
-          error: (error) => {
-            console.error(values, 'dataTerkirim');
-            console.error(error);
-            return error.response?.data?.message || 'Terjadi kesalahan saat melakukan pendaftaran';
+      // return toast.promise(
+      //   apiService.request({
+      //     method: 'POST',
+      //     url: 'register-patient',
+      //     data: values
+      //   }),
+      //   {
+      //     loading: 'Sedang melakukan pendaftaran...',
+      //     success: () => toast.success('Berhasil Register'),
+      //     error: (error) => {
+      //       console.error(values, 'dataTerkirim');
+      //       console.error(error);
+      //       return error.response?.data?.message || 'Terjadi kesalahan saat melakukan pendaftaran';
+      //     }
+      //   }
+      // );
+      try {
+        await toast.promise(
+          ClientRequest.CreatePasienNoToken(values).then((res) => {
+            return res
+          }),
+          {
+            loading: 'Processing...',
+            success: (res) => {
+              return "Berhasil Register Pasien"
+            },
+            error: (error) => {
+              return error.response.data.message || 'Something went wrong!'
+            }
           }
-        }
-      );
+        )
+      } catch (error) {
+        console.log(error)
+      }
     }
   });
   
@@ -66,7 +85,14 @@ export default function Home() {
                   <Input  name={'nik'} onChange={formik.handleChange} placeholder={'NIK'}/>
                 </div>
               </div>
-              <Input type={'text'} name={'gender'} onChange={formik.handleChange} placeholder={'Jenis Kelamin'}/>
+              <div>
+                <h1 className='font-semibold mb-2'>Jenis Kelamin</h1>
+                <select className="border outline-none w-full py-[13px] rounded-[8px] px-[16px]" type={'text'} name={'gender'} onChange={formik.handleChange} placeholder={'Jenis Kelamin'}>
+                  <option value="Select Jenis Kelamin...">Select Jenis Kelamin...</option>
+                  <option value="Laki-laki">Laki-laki</option>
+                  <option value="Perempuan">Perempuan</option>
+                </select>
+              </div>
               <Input type={'date'} name={'date_birth'} onChange={formik.handleChange} placeholder={'Tanggal Lahir'}/>
               <Input  name={'address'} onChange={formik.handleChange} placeholder={'Alamat'}/>
               <Input  name={'work'} onChange={formik.handleChange} placeholder={'Pekerjaan'}/>

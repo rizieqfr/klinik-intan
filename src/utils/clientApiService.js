@@ -153,6 +153,14 @@ class ClientRequest {
         })
     }
 
+    static CreatePasienNoToken(data) {
+        let path = `register-patient`;
+        return request(`${this.urlAPI()}${path}`, {
+            method: 'POST',
+            data,
+        })
+    }
+
     static UpdatePasien(token, data, id) {
         let path = `patient/${id}`;
         return request(`${this.urlAPI()}${path}`, {
