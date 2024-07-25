@@ -6,11 +6,15 @@ import axios from "axios";
 import toast from "react-hot-toast";
 import apiService from "@/utils/apiService";
 import ClientRequest from "@/utils/clientApiService";
+import { useState } from "react";
 
 const inter = Inter({ subsets: ["latin"] });
 
 export default function Home() {
   const router = useRouter()
+  const [dataLogin, setDataLogin] = useState([])
+  console.log(dataLogin)
+  const [showData, setShowData] = useState(false)
   const formik = useFormik({
     initialValues : {
       fullname: '',
@@ -22,22 +26,6 @@ export default function Home() {
       work: '',
     },
     onSubmit: async (values) => {
-      // return toast.promise(
-      //   apiService.request({
-      //     method: 'POST',
-      //     url: 'register-patient',
-      //     data: values
-      //   }),
-      //   {
-      //     loading: 'Sedang melakukan pendaftaran...',
-      //     success: () => toast.success('Berhasil Register'),
-      //     error: (error) => {
-      //       console.error(values, 'dataTerkirim');
-      //       console.error(error);
-      //       return error.response?.data?.message || 'Terjadi kesalahan saat melakukan pendaftaran';
-      //     }
-      //   }
-      // );
       try {
         await toast.promise(
           ClientRequest.CreatePasienNoToken(values).then((res) => {
@@ -46,6 +34,9 @@ export default function Home() {
           {
             loading: 'Processing...',
             success: (res) => {
+              console.log(res)
+              setDataLogin(res.data.data)
+              setShowData(true)
               return "Berhasil Register Pasien"
             },
             error: (error) => {
@@ -103,6 +94,44 @@ export default function Home() {
             <h1 className="text-center mt-6">Sudah pernah daftar sebelumnya? <span><button className="font-semibold hover:underline">Login Sekarang</button></span></h1>
           </div>
         </div>
+        {showData && (
+          <div className='flex items-center justify-center pb-20 gap-10'>
+          <div id='reservasiElement' className='rounded-xl py-10 border px-20 bg-[#00A9AE] shadow-lg text-white'>
+              <div className='pb-3 border-b-2 mb-6 text-center font-semibold text-xl'>
+                  <h1 className='font-bold'>Berhasil Mendaftar Sebagai Pasien!</h1>
+                  <h1 className='text-base'>Berikut adalah data diri anda:</h1>
+              </div>
+              <div className='flex items-center justify-center'>
+                <div className='grid grid-cols-12'>
+                    <div className='col-span-3 font-semibold '>
+                        <h1>No. Rekam Medis</h1>
+                        <h1>NIK</h1>
+                    </div>
+                    <div className='col-span-1 text-end pr-2'>
+                        <h1>:</h1>
+                        <h1>:</h1>
+                    </div>
+                    <div className='col-span-8 font-semibold'>
+                        <p>{dataLogin?.nik || '-'}</p>
+                        <p>{dataLogin?.no_rm || '-'}</p>
+                    </div>
+                </div>
+              </div>
+          </div>
+          <button
+              className='mt-6 py-2 px-4 bg-red-500 text-white font-bold rounded'
+              onClick={() => {
+                  const printContents = document.getElementById('reservasiElement').innerHTML;
+                  const originalContents = document.body.innerHTML;
+                  document.body.innerHTML = printContents;
+                  window.print();
+                  document.body.innerHTML = originalContents;
+              }}
+          >
+          Cetak Data Akun Pasien
+          </button>
+      </div>
+        )}
       </section>
     </>
   )
