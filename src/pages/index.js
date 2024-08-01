@@ -2,18 +2,14 @@ import { Inter } from "next/font/google";
 import Input from "@/components/input";
 import { useFormik } from "formik";
 import { useRouter } from "next/router";
-import axios from "axios";
 import toast from "react-hot-toast";
-import apiService from "@/utils/apiService";
 import ClientRequest from "@/utils/clientApiService";
 import { useState } from "react";
 
-const inter = Inter({ subsets: ["latin"] });
 
 export default function Home() {
   const router = useRouter()
   const [dataLogin, setDataLogin] = useState([])
-  console.log(dataLogin)
   const [showData, setShowData] = useState(false)
   const formik = useFormik({
     initialValues : {
@@ -91,7 +87,7 @@ export default function Home() {
             <div className="flex items-center justify-center mt-6">
               <button onClick={formik.handleSubmit} className="px-[40px] py-[20px] bg-[#0179FF] hover:bg-blue-700 text-white rounded-md shadow-md font-semibold">Daftar Sekarang</button>
             </div>
-            <h1 className="text-center mt-6">Sudah pernah daftar sebelumnya? <span><button className="font-semibold hover:underline">Login Sekarang</button></span></h1>
+            <h1 className="text-center mt-6">Sudah pernah daftar sebelumnya? <span><button onClick={() => router.push('/auth/login')} className="font-semibold hover:underline">Login Sekarang</button></span></h1>
           </div>
         </div>
         {showData && (

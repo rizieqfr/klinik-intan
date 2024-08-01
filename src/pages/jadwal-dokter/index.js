@@ -7,12 +7,10 @@ import React from 'react'
 const kolomJadwalDokter = [
     {
         header: 'No.',
-        accessorKey: 'idx',
-        cell: ({row}) => (
-            <>
-            {console.log(row, 'isi Row')}
-            <div>{toNumber(row.id) + 1}.</div>
-            </>
+        cell: (row) => (
+          <h1>
+            {parseInt(row.row.id) + 1}.
+          </h1>
         )
     },
     {

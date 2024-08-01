@@ -64,6 +64,7 @@ export default function DetailPasien(data) {
                         <h1>Nama: <span className='text-slate-500 font-normal'>{data.data.fullname}</span></h1>
                         <h1>Jenis Kelamin: <span className='text-slate-500 font-normal'>{data.data.gender}</span></h1>
                         <h1>Tanggal Lahir: <span className='text-slate-500 font-normal'>{ moment(data.data.date_birth).format('dddd, D MMMM YYYY')}</span></h1>
+                        <h1>Agama: <span className='text-slate-500 font-normal'>{data.data.agama}</span></h1>
                     </div>
                     <div className='space-y-[16px] font-semibold'>
                         <h1>Pekerjaan: <span className='text-slate-500 font-normal'>{data.data.work}</span></h1>

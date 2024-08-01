@@ -13,6 +13,9 @@ import React, { useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
 import { FaCirclePlus } from 'react-icons/fa6'
 import 'moment/locale/id';  // Import the Indonesian locale
+import ModalDelete from '@/components/ModalDelete'
+import Link from 'next/link'
+import { useRouter } from 'next/router'
 moment.locale('id');  // Set the locale to Indonesian
 
 
@@ -25,11 +28,50 @@ export default function PendaftaranRawatInap({accessToken}) {
     const [dataPasien, setDataPasien] = useState('')
     const [date, setDate] = useState('')
     const [jenisPendaftaran, setJenisPendaftaran] = useState('')
+    const [idPendaftaran, setIdPendaftaran] = useState('')
+    const [dataDetailReservasi, setDataDetailReservasi] = useState()
+    const [showDetailModal, setShowDetailModal] = useState(false)
+    const router = useRouter()
+
+    const openModalDetail = async (id) => {
+        setShowDetailModal(!showDetailModal)
+        try {
+            const res = await ClientRequest.GetReservasiById(accessToken, id)
+            console.log(res, 'resbyid')
+            setDataDetailReservasi(res.data.data)
+        } catch (error) {
+            
+        }
+    }
+
+    const hapusPendaftaran = async () => {
+        try {
+            await toast.promise(
+                ClientRequest.DeleteReservasi(accessToken, idPendaftaran),
+                {
+                    pending: 'Processing...',
+                    success: 'Sukses Delete Pendaftaran',
+                    error: 'Gagal Delete Pendaftaran',
+                }
+            );
+            getDataReservasi();
+            setShowDeleteModal(!showDeleteModal);
+        } catch (error) {
+            console.error(error);
+        }
+    }
+    
+    const actionHapusPendaftaran = async (id) => {
+        setIdPendaftaran(id)
+        setShowDeleteModal(!showDeleteModal)
+        getDataReservasi()
+    }
 
     const getDataReservasi = async () => {
         try {
-            const res = await ClientRequest.GetReservasi(accessToken)
+            const res = await ClientRequest.GetReservasi(accessToken, 'rawat-jalan')
             setDataReservasi(res.data.data)
+            console.log(res)
         } catch (error) {
             
         }
@@ -56,14 +98,23 @@ export default function PendaftaranRawatInap({accessToken}) {
 
     const kolomReservasi = [
         {
-            accessorKey: 'no_RM',
+            header: 'No.',
+            cell: (row) => (
+              <h1>
+                {parseInt(row.row.id) + 1}.
+              </h1>
+            )
+        },
+        {
+            accessorKey: 'no_rm',
             header: 'No. Rm'
         },
         {
             accessorKey: 'date',
             header: 'Hari Tanggal',
             cell: ({row}) => (
-                <h1>{moment(row.original.date).format('dddd, D MMMM YYYY')}</h1>
+                <h1>{moment(row.original.date).format('dddd, D MMMM YYYY, [Pukul] HH:mm')}</h1>
+
             )
         },
         {
@@ -93,9 +144,14 @@ export default function PendaftaranRawatInap({accessToken}) {
         {
             header: 'Status Pelayanan',
             cell: ({ row }) => (
-                <h1 className={`font-semibold rounded-sm p-1 text-md text-center border ${row.original.statusPeriksa ? 'bg-green-500 text-white' : 'bg-red-500 text-white'}`}>
-                    {row.original.statusPeriksa ? 'Sudah Dilayani' : 'Belum Dilayani'}
-                </h1>
+                <div className='flex items-center justify-center gap-3'>
+                    <h1 className={`font-semibold rounded-sm py-[3px] px-[14px] text-center text-sm text border ${row.original.statusPeriksa ? 'bg-green-500 text-white' : 'bg-red-500 text-white'}`}>
+                        {row.original.statusPeriksa ? 'Sudah Dilayani' : 'Belum Dilayani'}
+                    </h1>
+                    <button onClick={() => actionHapusPendaftaran(row.original.id)} className='bg-[#FF0000] text-white rounded px-[14px] py-[3px] font-semibold text-sm'>Hapus</button>
+                    <button onClick={() => openModalDetail(row.original.id)} className='bg-blue-500 text-white rounded px-[14px] py-[3px] font-semibold text-sm'>Detail</button>
+                    <button onClick={() => router.push(`/reservasi/cetak/${row.original.id}`)} className='bg-yellow-500 text-white  rounded px-[14px] py-[3px] font-semibold text-sm'>Cetak</button>
+                </div>
             )
         }
         
@@ -107,13 +163,13 @@ export default function PendaftaranRawatInap({accessToken}) {
           patientId : '',
           date: date,
           pembayaran: 'Umum',
-          jenisPerawatan : '',
+          jenisPerawatan : 'rawat-jalan',
           keluhan : '',
         },
         onSubmit: async (value) => {
           try {
             await toast.promise(
-              ClientRequest.CreateReservasi(localStorage.getItem('token-pasien') ,value).then((res) => {
+              ClientRequest.CreateReservasi(accessToken ,value).then((res) => {
                 return res
               }),
               {
@@ -164,6 +220,46 @@ export default function PendaftaranRawatInap({accessToken}) {
   return (
     <div>
         <Modal 
+            activeModal={showDetailModal}
+            title={`Detail Reservasi Pasien`}
+            buttonClose={ () => setShowDetailModal(!showDetailModal)}
+            width={'1000px'}
+            content= {
+                <div className=' w-full space-y-[12px]'>
+                    <div className='grid grid-cols-12 gap-y-8'>
+                        <div className='grid space-y-2 col-span-2 items-center'>
+                            <h1 className='text-[#353A40] font-semibold'>Pasien</h1>
+                            <h1 className='text-[#353A40] font-semibold'>Tanggal Berobat</h1>
+                            <h1 className='text-[#353A40] font-semibold'>Dokter & Poli Tujuan</h1>
+                            <h1 className='text-[#353A40] font-semibold'>Jenis Perawatan</h1>
+                            <h1 className='text-[#353A40] font-semibold'>Keluhan</h1>
+                            <h1 className='text-[#353A40] font-semibold'>Jenis Pembayaran</h1>
+                        </div>
+                        <div className='grid items-center text-end pr-3 col-span-1'>
+                            <h1>:</h1>
+                            <h1>:</h1>
+                            <h1>:</h1>
+                            <h1>:</h1>
+                            <h1>:</h1>
+                            <h1>:</h1>
+                        </div>
+                        <div className='grid space-y-2 col-span-9 items-center'>
+                            <h1>{dataDetailReservasi?.patient?.fullname}</h1>
+                            <h1>{dataDetailReservasi?.date}</h1>
+                            <h1>{dataDetailReservasi?.jadwal_dokter?.namaDokter} - {dataDetailReservasi?.jadwal_dokter.poli}</h1>
+                            <h1>{dataDetailReservasi?.jenisPerawatan}</h1>
+                            <h1>{dataDetailReservasi?.jenisPerawatan === 'rawat-inap' ? '-' : dataDetailReservasi?.keluhan}</h1>
+                            <h1>{dataDetailReservasi?.pembayaran}</h1>
+                        </div>
+                    </div>
+                    <div className='flex items-center justify-end gap-3'>
+                        <button onClick={() => setShowDetailModal(!showDetailModal)} className='border-[#0179FF] border text-[#0179FF] font-semibold px-[33px] py-[15px] rounded'>Close</button>
+                    </div>
+
+                </div>
+            }
+        />
+        <Modal 
             activeModal={showAddModal}
             title={`Pendaftaran Pasien Rawat Jalan `}
             buttonClose={ () => setShowAddModal(!showAddModal)}
@@ -176,12 +272,10 @@ export default function PendaftaranRawatInap({accessToken}) {
                                 <h1 className='text-[#353A40] font-semibold'>Pasien</h1>
                                 <h1 className='text-[#353A40] font-semibold'>Tanggal Berobat</h1>
                                 <h1 className='text-[#353A40] font-semibold'>Dokter & Poli Tujuan</h1>
-                                <h1 className='text-[#353A40] font-semibold'>Jenis Perawatan</h1>
                                 <h1 className='text-[#353A40] font-semibold'>Keluhan</h1>
                                 <h1 className='text-[#353A40] font-semibold'>Jenis Pembayaran</h1>
                             </div>
                             <div className='grid items-center text-end pr-3 col-span-1'>
-                                <h1>:</h1>
                                 <h1>:</h1>
                                 <h1>:</h1>
                                 <h1>:</h1>
@@ -209,14 +303,6 @@ export default function PendaftaranRawatInap({accessToken}) {
                                     </select>
                                 </div>
                                 <div>
-                                    <select onChange={formik.handleChange} className='py-[13px] px-[16px] border rounded w-full' name="jenisPerawatan" value={formik.values.jenisPerawatan}>
-                                        <option value="">Pilih Jenis Perawatan</option>
-                                        <option value='IGD'>IGD</option>
-                                        <option value='Rawat Jalan'>Rawat Jalan</option>
-                                        <option value='Rawat Inap'>Rawat Inap</option>
-                                    </select>
-                                </div>
-                                <div>
                                     <textarea className='border outline-none w-full py-[13px] rounded-[8px] px-[16px]' onChange={formik.handleChange} name={'keluhan'} placeholder={'Keluhan'} type={'text'} />
                                 </div>
                                 <div>
@@ -228,11 +314,16 @@ export default function PendaftaranRawatInap({accessToken}) {
 
                     <div className='flex items-center justify-end gap-3'>
                         <button onClick={() => setShowAddModal(!showAddModal)} className='border-[#0179FF] border text-[#0179FF] font-semibold px-[33px] py-[15px] rounded'>Batal</button>
-                        <button onClick={formik.handleSubmit} className='bg-[#0179FF] text-white font-semibold px-[33px] py-[15px] rounded'>Edit</button>
+                        <button onClick={formik.handleSubmit} className='bg-[#0179FF] text-white font-semibold px-[33px] py-[15px] rounded'>Tambah</button>
                     </div>
 
                 </div>
             }
+        />
+        <ModalDelete
+            activeModal={showDeleteModal}
+            buttonClose={() => setShowDeleteModal(!showDeleteModal)}
+            submitButton={hapusPendaftaran}
         />
         <div className='bg-white flex gap-[32px] min-h-screen'>
                 <Sidebar />

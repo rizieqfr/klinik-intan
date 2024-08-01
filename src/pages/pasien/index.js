@@ -23,6 +23,14 @@ export default function Pasien({accessToken}) {
     const [data, setData] = useState([]);
     const kolomPasien = [
         {
+            header: 'No.',
+            cell: (row) => (
+              <h1>
+                {parseInt(row.row.id) + 1}.
+              </h1>
+            )
+        },
+        {
             header: 'No Rm',
             accessorKey: 'no_rm',
             cell: ({row}) => (

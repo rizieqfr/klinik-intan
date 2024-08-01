@@ -306,8 +306,8 @@ class ClientRequest {
 
     // Payment
 
-    static GetPayment(token, keyword, page) {
-        let path = `transaction`;
+    static GetPayment(token, keyword) {
+        let path = `transaction/${keyword}`;
         return request(`${this.urlAPI()}${path}`, {
             method: 'GET',
             headers: {
@@ -317,7 +317,7 @@ class ClientRequest {
     }
 
     static GetPaymentById(token, id) {
-        let path = `transaction?invoiceId${id}`;
+        let path = `transaction?invoiceId=${id}`;
         return request(`${this.urlAPI()}${path}`, {
             method: 'GET',
             headers: {
@@ -389,6 +389,16 @@ class ClientRequest {
         })
     }
 
+    static DeleteReservasi(token, id) {
+        let path = `reservation/${id}`;
+        return request(`${this.urlAPI()}${path}`, {
+            method: 'DELETE',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+            },
+        })
+    }
+
     static CreateReservasi(token, data) {
         let path = `reservation`;
         return request(`${this.urlAPI()}${path}`, {
@@ -401,6 +411,16 @@ class ClientRequest {
     }
 
     static GetReservasi(token, keyword) {
+        let path = `type-reservation/${keyword}`;
+        return request(`${this.urlAPI()}${path}`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        })
+    }
+
+    static GetAllReservasi(token) {
         let path = `reservation`;
         return request(`${this.urlAPI()}${path}`, {
             method: 'GET',

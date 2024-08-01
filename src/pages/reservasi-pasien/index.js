@@ -38,7 +38,7 @@ export default function PasienLama() {
             success: (res) => {
               console.log(res, 'res sukses reservasi')
               setDataReservasi(res.data.data)
-              setShowReservasi(!showReservasi)
+              setShowReservasi(true)
               return 'Berhasil Reservasi!'
             },
             error: (error) => {
@@ -129,9 +129,9 @@ export default function PasienLama() {
                 <h1 className='font-semibold mb-2'>Jenis Perawatan</h1>
                 <select onChange={formik.handleChange} className='py-[13px] px-[16px] border rounded w-full' name="jenisPerawatan" value={formik.values.jenisPerawatan}>
                   <option value="">Pilih Jenis Perawatan</option>
-                  <option value='IGD'>IGD</option>
-                  <option value='Rawat Jalan'>Rawat Jalan</option>
-                  <option value='Rawat Inap'>Rawat Inap</option>
+                  <option value='UGD'>UGD</option>
+                  <option value='rawat-jalan'>Rawat Jalan</option>
+                  <option value='rawat-inap'>Rawat Inap</option>
                 </select>
               </div>
 

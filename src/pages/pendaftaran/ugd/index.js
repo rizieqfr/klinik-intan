@@ -13,6 +13,9 @@ import React, { useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
 import { FaCirclePlus } from 'react-icons/fa6'
 import 'moment/locale/id';  // Import the Indonesian locale
+import ModalDelete from '@/components/ModalDelete'
+import Link from 'next/link'
+import { useRouter } from 'next/router'
 moment.locale('id');  // Set the locale to Indonesian
 
 
@@ -25,10 +28,36 @@ export default function PendaftaranUgd({accessToken}) {
     const [dataPasien, setDataPasien] = useState('')
     const [date, setDate] = useState('')
     const [jenisPendaftaran, setJenisPendaftaran] = useState('')
+    const [idPendaftaran, setIdPendaftaran] = useState('')
+    const [dataDetailReservasi, setDataDetailReservasi] = useState()
+    const [showDetailModal, setShowDetailModal] = useState(false)
+    const router = useRouter()
+    const hapusPendaftaran = async () => {
+        try {
+            await toast.promise(
+                ClientRequest.DeleteReservasi(accessToken, idPendaftaran),
+                {
+                    pending: 'Processing...',
+                    success: 'Sukses Delete Pendaftaran',
+                    error: 'Gagal Delete Pendaftaran',
+                }
+            );
+            getDataReservasi();
+            setShowDeleteModal(!showDeleteModal);
+        } catch (error) {
+            console.error(error);
+        }
+    }
+    
+    const actionHapusPendaftaran = async (id) => {
+        setIdPendaftaran(id)
+        setShowDeleteModal(!showDeleteModal)
+        getDataReservasi()
+    }
 
     const getDataReservasi = async () => {
         try {
-            const res = await ClientRequest.GetReservasi(accessToken)
+            const res = await ClientRequest.GetReservasi(accessToken, 'ugd')
             setDataReservasi(res.data.data)
             console.log(res.data.data)
         } catch (error) {
@@ -57,8 +86,12 @@ export default function PendaftaranUgd({accessToken}) {
 
     const kolomReservasi = [
         {
-            accessorKey: 'No.',
-            header: 'No.'
+            header: 'No.',
+            cell: (row) => (
+              <h1>
+                {parseInt(row.row.id) + 1}.
+              </h1>
+            )
         },
         {
             accessorKey: 'no_rm',
@@ -76,7 +109,7 @@ export default function PendaftaranUgd({accessToken}) {
             accessorKey: 'date',
             header: 'Waktu Pendaftaran',
             cell: ({row}) => (
-                <h1>{moment(row.original.date).format('dddd, D MMMM YYYY')}</h1>
+                <h1>{moment(row.original.date).format('dddd, D MMMM YYYY, [Pukul] HH:mm')}</h1>
             )
         },
         {
@@ -88,7 +121,7 @@ export default function PendaftaranUgd({accessToken}) {
             header: 'Dokter'
         },
         {
-            accessorKey: 'pengantar',
+            accessorKey: 'pengantarPatient',
             header: 'Pengantar'
         },
         {
@@ -98,9 +131,14 @@ export default function PendaftaranUgd({accessToken}) {
         {
             header: 'Status',
             cell: ({ row }) => (
-                <h1 className={`font-semibold rounded-sm p-1 text-md text-center border ${row.original.statusPeriksa ? 'bg-green-500 text-white' : 'bg-red-500 text-white'}`}>
-                    {row.original.statusPeriksa ? 'Sudah Dilayani' : 'Belum Dilayani'}
-                </h1>
+                <div className='flex items-center justify-center gap-3'>
+                    <h1 className={`font-semibold rounded-sm py-[3px] px-[14px] text-center text-sm text border ${row.original.statusPeriksa ? 'bg-green-500 text-white' : 'bg-red-500 text-white'}`}>
+                        {row.original.statusPeriksa ? 'Sudah Dilayani' : 'Belum Dilayani'}
+                    </h1>
+                    <button onClick={() => actionHapusPendaftaran(row.original.id)} className='bg-[#FF0000] text-white rounded px-[14px] py-[3px] font-semibold text-sm'>Hapus</button>
+                    <button onClick={() => openModalDetail(row.original.id)} className='bg-blue-500 text-white rounded px-[14px] py-[3px] font-semibold text-sm'>Detail</button>
+                    <button onClick={() => router.push(`/reservasi/cetak/${row.original.id}`)} className='bg-yellow-500 text-white  rounded px-[14px] py-[3px] font-semibold text-sm'>Cetak</button>
+                </div>
             )
         }
         
@@ -110,21 +148,21 @@ export default function PendaftaranUgd({accessToken}) {
         initialValues: {
           jadwalDokterId: '',
           patientId : '',
-          date: date,
-          pembayaran: 'Umum',
-          jenisPerawatan : '',
+          pembayaran: 'umum',
           keluhan : '',
+          pengantarPatient: '',
+          jenisPerawatan: 'ugd'
         },
         onSubmit: async (value) => {
+            console.log(value)
           try {
             await toast.promise(
-              ClientRequest.CreateReservasi(localStorage.getItem('token-pasien') ,value).then((res) => {
+              ClientRequest.CreateReservasi(accessToken ,value).then((res) => {
                 return res
               }),
               {
                 loading: 'Loading...',
                 success: (res) => {
-                  console.log(res, 'res sukses reservasi')
                   formik.resetForm()
                   getDataReservasi()
                   setShowAddModal(!showAddModal)
@@ -137,33 +175,27 @@ export default function PendaftaranUgd({accessToken}) {
               }
             )
           } catch (error) {
-            console.log(value)
-            toast.error(error.data.message)
+            console.log(error)
           }
         }
     })
-    const handleSearchPoli = (e) => {
-        setDate(e.target.value)
-        debounceDataPoli(e.target.value)
-      }
-    
-      const debounceDataPoli = debounce(async (keyword) => {
+
+    const openModalDetail = async (id) => {
+        setShowDetailModal(!showDetailModal)
         try {
-          const res = await ClientRequest.GetJadwalDokterAll('','','', keyword)
-          setDataDokter(res.data.data)
+            const res = await ClientRequest.GetReservasiById(accessToken, id)
+            console.log(res, 'resbyid')
+            setDataDetailReservasi(res.data.data)
         } catch (error) {
-          console.log(error)
+            
         }
-      }, 500)
+    }
 
     useEffect(() => {
         getDataReservasi()
         getDataPasien()
         getDataDokter()
     }, [])
-    useEffect(() => {
-        formik.setFieldValue('date', date);
-      }, [date])
 
     
   return (
@@ -207,12 +239,12 @@ export default function PendaftaranUgd({accessToken}) {
                                     <select onChange={formik.handleChange} className='py-[13px] px-[16px] border rounded w-full' name="jadwalDokterId"value={formik.values.jadwalDokterId}>
                                         <option value="">Pilih Poli Tujuan dan Jadwal Dokter...</option>
                                         {Object.values(dataDokter).map((item, idx) => (
-                                            <option  key={idx} disabled={!item.isAvailable} value={item.id}>{item.namaDokter || '-'}, Poli {item.poli} </option>
+                                            <option  key={idx} value={item.id}>{item.namaDokter || '-'}, Poli {item.poli} </option>
                                         ))}
                                     </select>
                                 </div>
                                 <div>
-                                    <Input onChange={formik.handleChange} name={'pengantarPasien'} value={formik.values.pengantarPasien} type={'text'} />
+                                    <Input onChange={formik.handleChange} name={'pengantarPatient'} value={formik.values.pengantarPatient} type={'text'} />
                                 </div>
                                 <div>
                                     <Input onChange={formik.handleChange} name={'pembayaran'} value={formik.values.pembayaran} className={'bg-slate-200 cursor-not-allowed'} readOnly={true} type={'text'} />
@@ -223,11 +255,56 @@ export default function PendaftaranUgd({accessToken}) {
 
                     <div className='flex items-center justify-end gap-3'>
                         <button onClick={() => setShowAddModal(!showAddModal)} className='border-[#0179FF] border text-[#0179FF] font-semibold px-[33px] py-[15px] rounded'>Batal</button>
-                        <button onClick={formik.handleSubmit} className='bg-[#0179FF] text-white font-semibold px-[33px] py-[15px] rounded'>Edit</button>
+                        <button onClick={formik.handleSubmit} className='bg-[#0179FF] text-white font-semibold px-[33px] py-[15px] rounded'>Tambah</button>
                     </div>
 
                 </div>
             }
+        />
+        <Modal 
+            activeModal={showDetailModal}
+            title={`Detail Reservasi Pasien`}
+            buttonClose={ () => setShowDetailModal(!showDetailModal)}
+            width={'1000px'}
+            content= {
+                <div className=' w-full space-y-[12px]'>
+                    <div className='grid grid-cols-12 gap-y-8'>
+                        <div className='grid space-y-2 col-span-2 items-center'>
+                            <h1 className='text-[#353A40] font-semibold'>Pasien</h1>
+                            <h1 className='text-[#353A40] font-semibold'>Tanggal Berobat</h1>
+                            <h1 className='text-[#353A40] font-semibold'>Dokter & Poli Tujuan</h1>
+                            <h1 className='text-[#353A40] font-semibold'>Jenis Perawatan</h1>
+                            <h1 className='text-[#353A40] font-semibold'>Keluhan</h1>
+                            <h1 className='text-[#353A40] font-semibold'>Jenis Pembayaran</h1>
+                        </div>
+                        <div className='grid items-center text-end pr-3 col-span-1'>
+                            <h1>:</h1>
+                            <h1>:</h1>
+                            <h1>:</h1>
+                            <h1>:</h1>
+                            <h1>:</h1>
+                            <h1>:</h1>
+                        </div>
+                        <div className='grid space-y-2 col-span-9 items-center'>
+                            <h1>{dataDetailReservasi?.patient?.fullname}</h1>
+                            <h1>{dataDetailReservasi?.date}</h1>
+                            <h1>{dataDetailReservasi?.jadwal_dokter?.namaDokter} - {dataDetailReservasi?.jadwal_dokter.poli}</h1>
+                            <h1>{dataDetailReservasi?.jenisPerawatan}</h1>
+                            <h1>{dataDetailReservasi?.jenisPerawatan === 'rawat-inap' ? '-' : dataDetailReservasi?.keluhan}</h1>
+                            <h1>{dataDetailReservasi?.pembayaran}</h1>
+                        </div>
+                    </div>
+                    <div className='flex items-center justify-end gap-3'>
+                        <button onClick={() => setShowDetailModal(!showDetailModal)} className='border-[#0179FF] border text-[#0179FF] font-semibold px-[33px] py-[15px] rounded'>Close</button>
+                    </div>
+
+                </div>
+            }
+        />
+        <ModalDelete
+            activeModal={showDeleteModal}
+            buttonClose={() => setShowDeleteModal(!showDeleteModal)}
+            submitButton={hapusPendaftaran}
         />
         <div className='bg-white flex gap-[32px] min-h-screen'>
                 <Sidebar />

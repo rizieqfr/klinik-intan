@@ -41,7 +41,7 @@ export default function Login() {
                 error: (error) => {
                   console.error(values, 'dataTerkirim');
                   console.error(error);
-                  return error.response?.data?.message || 'Username atau Password salah!';
+                  return error.response?.data?.msg || 'Username atau Password salah!';
                 }
               }
             );

@@ -20,9 +20,11 @@ export default function Dokter({accessToken}) {
     const route = useRouter()
     const kolomDokter = [
         {
-            header: 'No',
-            cell: (info) => (
-                <h1>{info.row.index + 1}</h1>
+            header: 'No.',
+            cell: (row) => (
+              <h1>
+                {parseInt(row.row.id) + 1}.
+              </h1>
             )
         },
         {

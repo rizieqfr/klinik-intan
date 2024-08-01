@@ -18,10 +18,8 @@ export default function RekamMedis({accessToken, dataPasien, dataReservasi}) {
     const [idRekamMedis, setIdRekamMedis] = useState('')
     const [reservasi, setReservasi] = useState([])
 
-    console.log(reservasi, 'datapasienreservasi')
     
     const [dataRekamMedis, setDataRekamMedis] = useState('');
-    console.log(dataRekamMedis, 'DATA REKAM MEDIS')
     const getRekamMedis = async () => {
         try {
             const res = await ClientRequest.GetRekamMedis(accessToken)
@@ -31,8 +29,25 @@ export default function RekamMedis({accessToken, dataPasien, dataReservasi}) {
             console.log(error)
         }
     }
+    const getReservasi = async () => {
+        try {
+            const res = await ClientRequest.GetAllReservasi(accessToken)
+            console.log('Get Reservasi: ',res.data.data)
+            setReservasi(res.data.data)
+        } catch (error) {
+            console.log(error)
+        }
+    }
     const route = useRouter()
     const kolomRekamMedis = [
+        {
+            header: 'No.',
+            cell: (row) => (
+              <h1>
+                {parseInt(row.row.id) + 1}.
+              </h1>
+            )
+        },
         {
             header: 'Tanggal',
             accessorKey: 'createdAt',
@@ -162,19 +177,19 @@ export default function RekamMedis({accessToken, dataPasien, dataReservasi}) {
         debounceAutofill(e.target.value)
       }
     
-      const debounceAutofill = debounce(async (id) => {
-        try {
-          const res = await ClientRequest.GetReservasiById(accessToken, id)
-          console.log(res, 'res debounce')
-          formik.setFieldValue('keluhan', res.data.data.keluhan)
-          formik.setFieldValue('pelayanan', res.data.data.jenisPerawatan)
-          formik.setFieldValue('idReservasi', res.data.data.id)
-          formik.setFieldValue('patientId', res.data.data.patientId)
-          formik.setFieldValue('diagnosa', res.data.data.kode_diagnosa)
-        } catch (error) {
-          console.log(error)
-        }
-      }, 500)
+    const debounceAutofill = debounce(async (id) => {
+    try {
+        const res = await ClientRequest.GetReservasiById(accessToken, id)
+        console.log(res, 'res debounce')
+        formik.setFieldValue('keluhan', res.data.data.keluhan)
+        formik.setFieldValue('pelayanan', res.data.data.jenisPerawatan)
+        formik.setFieldValue('idReservasi', res.data.data.id)
+        formik.setFieldValue('patientId', res.data.data.patientId)
+        formik.setFieldValue('diagnosa', res.data.data.kode_diagnosa)
+    } catch (error) {
+        console.log(error)
+    }
+    }, 500)
 
     const openModalEdit = async (id) => {
         setIdRekamMedis(id)
@@ -192,13 +207,21 @@ export default function RekamMedis({accessToken, dataPasien, dataReservasi}) {
         }
     }
 
-    useEffect(() => {
-        getRekamMedis()
-    }, [])
+    // const handleServiceChange = (serviceId, action) => {
+    //     const selectedService = dataLayanan.find(service => service.id === serviceId);
+    //     console.log(selectedService, 'selectedService')
+    //     if (action === 'add') {
+    //     setSelectedServices([...selectedServices, selectedService]);
+    //     } else if (action === 'delete') {
+    //     const updatedServices = selectedServices.filter(service => service.id !== serviceId);
+    //     setSelectedServices(updatedServices);
+    //     }
+    // };
 
     useEffect(() => {
-        setReservasi(dataReservasi)
-    }, [dataReservasi])
+        getRekamMedis()
+        getReservasi()
+    }, [])
   return (
     <div>
         <Modal 
@@ -221,20 +244,20 @@ export default function RekamMedis({accessToken, dataPasien, dataReservasi}) {
                         <div className='grid space-y-2 col-span-9'>
                             <select onChange={handleAutofill} className='py-[13px] px-[16px] border rounded w-full outline-none' name="patientId" >
                                 <option value="">Pilih Pasien dalam Antrian...</option>
-                                {Object.values(reservasi).filter(item => item.statusPeriksa === false).length > 0 ? (
+                                {Object.values(reservasi).filter(item => item.status === false).length > 0 ? (
                                     <>
                                         <option value="">Pilih Pasien dalam Antrian...</option>
                                         {Object.values(reservasi)
-                                            .filter(item => item.statusPeriksa === false)
+                                            .filter(item => item.status === false)
                                             .map((item, idx) => (
                                                 <option key={idx} value={item.id}>
-                                                    Antrian {item.queue} - {item.fullname}
+                                                    Antrian {item.queue} - {item.patient?.fullname}
                                                 </option>
                                             ))
                                         }
                                     </>
                                 ) : (
-                                    <option value="">Tidak ada pasien dalam antrian</option>
+                                    <option disabled  >Tidak ada pasien dalam antrian</option>
                                 )}
                             </select>
                             {formik.touched.patientId && formik.errors.patientId && <p className='text-xs font-medium text-red-600 ml-1'>*{formik.errors.patientId}</p>}
@@ -349,7 +372,7 @@ export default function RekamMedis({accessToken, dataPasien, dataReservasi}) {
 export const getServerSideProps = withSession(async ({ req }) => {
 	const accessToken = req.session?.auth?.access_token
     const resPasien = await ClientRequest.GetPasien(accessToken)
-    const resReservasi = await ClientRequest.GetReservasi(accessToken)
+    const resReservasi = await ClientRequest.GetAllReservasi(accessToken)
 	const isLoggedIn = !!accessToken
 	const validator = [isLoggedIn]
 	return routeGuard(validator, '/auth/login', {

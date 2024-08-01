@@ -2,7 +2,7 @@ import { useRouter } from 'next/router'
 import { FaBookMedical, FaHandHoldingMedical, FaUserDoctor, FaUserGear } from "react-icons/fa6";
 import { FaHome } from "react-icons/fa";
 import React, { useState } from 'react'
-import { MdAssignmentInd, MdPayments, MdRsvp } from "react-icons/md";
+import { MdAssignmentInd,  MdPayments,  MdRsvp } from "react-icons/md";
 import { RiAdminFill, RiLogoutBoxFill } from "react-icons/ri";
 import toast from 'react-hot-toast';
 import { withSession } from '@/utils/sessionWrapper';

@@ -21,9 +21,11 @@ export default function UserManagement({accessToken}) {
     const route = useRouter()
     const kolomUser = [
         {
-            header: 'No',
-            cell: ({row}) => (
-                <div>1.</div>
+            header: 'No.',
+            cell: (row) => (
+              <h1>
+                {parseInt(row.row.id) + 1}.
+              </h1>
             )
         },
         {

@@ -35,20 +35,47 @@ export default function Invoice({dataInvoice}) {
             <h1 className='text-center'>ID: {dataInvoice?.invoice}</h1>
 
             <div className='mt-6'>
-                <h1>Nama: {dataInvoice?.fullname}</h1>
-                <h1>Tanggal: {dataInvoice?.createdAt}</h1>
-            </div>
-            <div className='mt-5'>
-                <div className='w-full'>
-                    <div className='border rounded-md p-4 w-full'>
-                        <p className='border-b py-3'>Biaya Layanan: <span className='text-slate-500 font-semibold '>Rp. {dataInvoice?.purchased.biayaLayanan}</span></p>
-                        <p className='border-b py-3'>Biaya Obat: <span className='text-slate-500 font-semibold'>Rp. {dataInvoice?.purchased.biayaObat}</span></p>
-                        <h1 className='border-b py-3'>Total Pembayaran: <span className='text-slate-500 font-semibold'>Rp. {dataInvoice?.total_payment}</span></h1>
-                        <h1 className='py-3 text-end'>Status: <span className='text-red-500 font-bold '>{dataInvoice?.status}</span></h1>
-                    </div>
+    <h1>Nama: {dataInvoice?.fullname}</h1>
+    <h1>Tanggal: {dataInvoice?.createdAt}</h1>
+</div>
+<div className='mt-5'>
+    <div className='w-full'>
+        <div className='border rounded-md p-4 w-full'>
+            <table className='w-full'>
+                <thead>
+                    <tr>
+                        <th className='border-b py-3 text-left'>Nama Tarif</th>
+                        <th className='border-b py-3 text-left'>QTY</th>
+                        <th className='border-b py-3 text-left'>Harga</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td className='border-b py-3'>Biaya Layanan</td>
+                        <td className='border-b py-3'>1</td>
+                        <td className='border-b py-3'>Rp. {dataInvoice?.purchased.biayaLayanan}</td>
+                    </tr>
+                    <tr>
+                        <td className='border-b py-3'>Biaya Obat</td>
+                        <td className='border-b py-3'>1</td>
+                        <td className='border-b py-3'>Rp. {dataInvoice?.purchased.biayaObat}</td>
+                    </tr>
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td className='border-t py-3 font-bold'>Jumlah Tarif</td>
+                        <td className='border-t py-3 font-bold'>2</td>
+                        <td className='border-t py-3 font-bold'>Rp. {dataInvoice?.total_payment}</td>
+                    </tr>
+                    <tr>
+                        <td className='py-3 text-end' colSpan='3'>Status: <span className='text-red-500 font-bold'>{dataInvoice?.status}</span></td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    </div>
+</div>
 
-                </div>
-            </div>
             <div className='mt-6'>
                 {/* <h1 className='text-lg font-medium text-end'>Total: Rp.{dataInvoice?.total_payment}</h1> */}
                 {/* <Image className='w-40 h-20 -rotate-12' src={''} alt="" /> */}

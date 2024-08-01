@@ -13,23 +13,50 @@ import React, { useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
 import { FaCirclePlus } from 'react-icons/fa6'
 import 'moment/locale/id';  // Import the Indonesian locale
+import ModalDelete from '@/components/ModalDelete'
+import Link from 'next/link'
 moment.locale('id');  // Set the locale to Indonesian
 
 
 export default function Reservasi({accessToken}) {
     const [showAddModal, setShowAddModal] = useState(false)
-    const [showEditModal, setShowEditModal] = useState(false)
+    const [showDetailModal, setShowDetailModal] = useState(false)
     const [showDeleteModal, setShowDeleteModal] = useState(false)
     const [dataReservasi, setDataReservasi] = useState('')
     const [dataDokter, setDataDokter] = useState('')
     const [dataPasien, setDataPasien] = useState('')
     const [date, setDate] = useState('')
+    const [idPendaftaran, setIdPendaftaran] = useState('')
+    const [dataDetailReservasi, setDataDetailReservasi] = useState()
+
+    const hapusPendaftaran = async () => {
+        try {
+            await toast.promise(
+                ClientRequest.DeleteReservasi(accessToken, idPendaftaran),
+                {
+                    pending: 'Processing...',
+                    success: 'Sukses Delete Pendaftaran',
+                    error: 'Gagal Delete Pendaftaran',
+                }
+            );
+            getDataReservasi();
+            setShowDeleteModal(!showDeleteModal);
+        } catch (error) {
+            console.error(error);
+        }
+    }
+    
+    const actionHapusPendaftaran = async (id) => {
+        setIdPendaftaran(id)
+        setShowDeleteModal(!showDeleteModal)
+        getDataReservasi()
+    }
 
     const getDataReservasi = async () => {
         try {
-            const res = await ClientRequest.GetReservasi(accessToken)
+            const res = await ClientRequest.GetAllReservasi(accessToken)
             setDataReservasi(res.data.data)
-            console.log('Data Reservasi: ',res.data.data)
+            console.log('Data Reservasi: ',res)
         } catch (error) {
             
         }
@@ -55,23 +82,40 @@ export default function Reservasi({accessToken}) {
 
     const kolomReservasi = [
         {
-            accessorKey: 'date',
-            header: 'Hari Tanggal',
-            cell: ({row}) => (
-                <h1>{moment(row.original.date).format('dddd, D MMMM YYYY')}</h1>
+            header: 'No.',
+            cell: (row) => (
+              <h1>
+                {parseInt(row.row.id) + 1}.
+              </h1>
             )
         },
         {
-            accessorKey: 'fullname',
+            accessorKey: 'date',
+            header: 'Hari Tanggal',
+            cell: ({row}) => (
+                <h1>{moment(row.original.createdAt).format('dddd, D MMMM YYYY, [Pukul] hh:mm')}</h1>
+
+            )
+        },
+        {
+            accessorKey: 'date',
+            header: 'Tanggal Berobat'
+        },
+        {
+            accessorKey: 'patient.fullname',
             header: 'Nama Pasien'
         },
         {
-            accessorKey: 'namaDokter',
+            accessorKey: 'jadwal_dokter.namaDokter',
             header: 'Dokter'
         },
         {
-            accessorKey: 'poli',
+            accessorKey: 'jadwal_dokter.poli',
             header: 'Poli yang Dituju'
+        },
+        {
+            accessorKey: 'jenisPerawatan',
+            header: 'Jenis Pelayanan'
         },
         {
             header: 'Nomor Antrian',
@@ -82,9 +126,15 @@ export default function Reservasi({accessToken}) {
         {
             header: 'Status Pelayanan',
             cell: ({ row }) => (
-                <h1 className={`font-semibold rounded-sm p-1 text-md text-center border ${row.original.statusPeriksa ? 'bg-green-500 text-white' : 'bg-red-500 text-white'}`}>
-                    {row.original.statusPeriksa ? 'Sudah Dilayani' : 'Belum Dilayani'}
-                </h1>
+                <div className='flex gap-2 items-center'>
+                    <h1 className={`font-semibold rounded-sm p-1 text-md text-center border ${row.original.status ? 'bg-green-500 text-white' : 'bg-[#FF0000] text-white'}`}>
+                        {row.original.status ? 'Sudah Dilayani' : 'Belum Dilayani'}
+                    </h1>
+                    <button onClick={() => actionHapusPendaftaran(row.original.id)} className='bg-[#FF0000] text-white rounded px-[14px] py-[3px] font-semibold text-sm'>Hapus</button>
+                    <button onClick={() => openModalDetail(row.original.id)} className='bg-blue-500 text-white rounded px-[14px] py-[3px] font-semibold text-sm'>Detail</button>
+                    <Link href={`reservasi/cetak/${row.original.id}`} className='bg-yellow-500 text-white  rounded px-[14px] py-[3px] font-semibold text-sm'>Cetak</Link>
+                </div>
+
             )
         }
         
@@ -129,16 +179,27 @@ export default function Reservasi({accessToken}) {
     const handleSearchPoli = (e) => {
         setDate(e.target.value)
         debounceDataPoli(e.target.value)
-      }
-    
-      const debounceDataPoli = debounce(async (keyword) => {
+    }
+
+    const openModalDetail = async (id) => {
+        setShowDetailModal(!showDetailModal)
         try {
-          const res = await ClientRequest.GetJadwalDokterAll('','','', keyword)
-          setDataDokter(res.data.data)
+            const res = await ClientRequest.GetReservasiById(accessToken, id)
+            console.log(res, 'resbyid')
+            setDataDetailReservasi(res.data.data)
         } catch (error) {
-          console.log(error)
+            
         }
-      }, 500)
+    }
+
+    const debounceDataPoli = debounce(async (keyword) => {
+    try {
+        const res = await ClientRequest.GetJadwalDokterAll('','','', keyword)
+        setDataDokter(res.data.data)
+    } catch (error) {
+        console.log(error)
+    }
+    }, 500)
 
     useEffect(() => {
         getDataReservasi()
@@ -152,6 +213,47 @@ export default function Reservasi({accessToken}) {
     
   return (
     <div>
+        <Modal 
+            activeModal={showDetailModal}
+            title={`Detail Reservasi Pasien`}
+            buttonClose={ () => setShowDetailModal(!showDetailModal)}
+            width={'1000px'}
+            content= {
+                <div className=' w-full space-y-[12px]'>
+                    <div className='grid grid-cols-12 gap-y-8'>
+                        <div className='grid space-y-2 col-span-2 items-center'>
+                            <h1 className='text-[#353A40] font-semibold'>Pasien</h1>
+                            <h1 className='text-[#353A40] font-semibold'>Tanggal Berobat</h1>
+                            <h1 className='text-[#353A40] font-semibold'>Dokter & Poli Tujuan</h1>
+                            <h1 className='text-[#353A40] font-semibold'>Jenis Perawatan</h1>
+                            <h1 className='text-[#353A40] font-semibold'>Keluhan</h1>
+                            <h1 className='text-[#353A40] font-semibold'>Jenis Pembayaran</h1>
+                        </div>
+                        <div className='grid items-center text-end pr-3 col-span-1'>
+                            <h1>:</h1>
+                            <h1>:</h1>
+                            <h1>:</h1>
+                            <h1>:</h1>
+                            <h1>:</h1>
+                            <h1>:</h1>
+                        </div>
+                        <div className='grid space-y-2 col-span-9 items-center'>
+                            <h1>{dataDetailReservasi?.patient?.fullname}</h1>
+                            <h1>{dataDetailReservasi?.date}</h1>
+                            <h1>{dataDetailReservasi?.jadwal_dokter?.namaDokter} - {dataDetailReservasi?.jadwal_dokter.poli}</h1>
+                            <h1>{dataDetailReservasi?.jenisPerawatan}</h1>
+                            <h1>{dataDetailReservasi?.jenisPerawatan === 'rawat-inap' ? '-' : dataDetailReservasi?.keluhan}</h1>
+                            <h1>{dataDetailReservasi?.pembayaran}</h1>
+                        </div>
+                    </div>
+                    <div className='flex items-center justify-end gap-3'>
+                        <button onClick={() => setShowDetailModal(!showDetailModal)} className='border-[#0179FF] border text-[#0179FF] font-semibold px-[33px] py-[15px] rounded'>Batal</button>
+                        <button onClick={formik.handleSubmit} className='bg-[#0179FF] text-white font-semibold px-[33px] py-[15px] rounded'>Add</button>
+                    </div>
+
+                </div>
+            }
+        />
         <Modal 
             activeModal={showAddModal}
             title={`Reservasi Pasien`}
@@ -214,11 +316,16 @@ export default function Reservasi({accessToken}) {
                     </div>
                     <div className='flex items-center justify-end gap-3'>
                         <button onClick={() => setShowAddModal(!showAddModal)} className='border-[#0179FF] border text-[#0179FF] font-semibold px-[33px] py-[15px] rounded'>Batal</button>
-                        <button onClick={formik.handleSubmit} className='bg-[#0179FF] text-white font-semibold px-[33px] py-[15px] rounded'>Edit</button>
+                        <button onClick={formik.handleSubmit} className='bg-[#0179FF] text-white font-semibold px-[33px] py-[15px] rounded'>Add</button>
                     </div>
 
                 </div>
             }
+        />
+        <ModalDelete
+            activeModal={showDeleteModal}
+            buttonClose={() => setShowDeleteModal(!showDeleteModal)}
+            submitButton={hapusPendaftaran}
         />
         <div className='bg-white flex gap-[32px] min-h-screen'>
                 <Sidebar />
@@ -227,13 +334,9 @@ export default function Reservasi({accessToken}) {
                         <h1 className='text-4xl text-[#353A40] font-bold'>Antrian Reservasi</h1>
                         <h1>Navigasi / <span className='text-cyan font-medium'>Antrian Reservasi</span></h1>
                     </div>
-                    <div className='flex items-center justify-end '>
-                        <button onClick={() => setShowAddModal(!showAddModal)} className='flex items-center justify-center gap-3 py-[14px] bg-[#0179FF] px-[30px] rounded text-white font-medium'>
-                            <FaCirclePlus className='text-xl' />
-                            <h1>Reservasi Baru</h1>
-                        </button>
+                    <div className='mt-24'>
+                        <Table data={dataReservasi} columns={kolomReservasi} />
                     </div>
-                    <Table data={dataReservasi} columns={kolomReservasi} />
                 </div>
             </div>
     </div>
