@@ -116,10 +116,10 @@ export default function Pembayaran({accessToken}) {
                             formik.resetForm()
                             getDataPayment()
                             setShowEditModal(!showEditModal)
-                            console.log(res, 'sukses')
+                            return 'Sukses Update Data Pembayaran'
                         },
                         error: (error) => {
-                            console.log(error, 'error')
+                            return 'Something went wrong'
                         }
                     }
                 )
