@@ -17,6 +17,8 @@ export default function Pembayaran({accessToken}) {
     const [dataPayment, setDataPayment] = useState('')
     const [idPayment, setIdPayment] = useState('')
     const route = useRouter()
+
+    
     
     const kolomPembayaran = [
         {
@@ -134,6 +136,7 @@ export default function Pembayaran({accessToken}) {
         setShowEditModal(!showEditModal)
         try {
             const res = await ClientRequest.GetRekamMedisById(accessToken, id)
+            console.log(res)
             formik.setFieldValue('statusPembayaran', res.data.data.status)
             formik.setFieldValue('biayaLayanan', res.data.data.purchased.biayaLayanan)
             formik.setFieldValue('biayaObat', res.data.data.purchased.biayaObat)

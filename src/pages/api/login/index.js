@@ -25,16 +25,16 @@ const api = withSessionRoute(async (req, res) => {
                 // return res.status(status).send({ message })
             } catch (error) {
 				console.log(error)
-                // if (error.response && error.response.data) {
-                //     const {
-                //         data: { message, errors },
-                //         status
-                //     } = error.response
-                //     return res.status(status).send({ message, status, errors })
-                // } else {
-                //     // Handle error without response data
-                //     return res.status(500).send({ message: 'Internal Server Error' })
-                // }
+                if (error.response && error.response.data) {
+                    const {
+                        data: { msg, errors },
+                        status
+                    } = error.response
+                    return res.status(status).send({ msg, status, errors })
+                } else {
+                    // Handle error without response data
+                    return res.status(500).send({ msg: 'Internal Server Error' })
+                }
             }
         }
         // default: {

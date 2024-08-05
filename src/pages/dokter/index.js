@@ -1,3 +1,4 @@
+import ModalDelete from '@/components/ModalDelete'
 import Table from '@/components/Table'
 import Modal from '@/components/modal'
 import Sidebar from '@/components/sidebar'
@@ -15,6 +16,7 @@ import { FaCirclePlus } from 'react-icons/fa6'
 export default function Dokter({accessToken}) {
     const [showAddModal, setShowAddModal] = useState(false)
     const [showEditModal, setShowEditModal] = useState(false)
+    const [showDeleteModal, setShowDeleteModal] = useState(false)
     const [idDokter, setIdDokter] = useState('')
     const [dataJadwalDokter, setDataJadwalDokter] = useState('')
     const route = useRouter()
@@ -64,7 +66,7 @@ export default function Dokter({accessToken}) {
             cell: ({row}) => (
                 <td className='flex justify-center'>
                     <button onClick={() => openEditJadwalDokter(row.original.id)} className='bg-[#FEC107] text-white rounded px-[14px] py-[3px] font-semibold text-sm mr-2'>Edit</button>
-                    <button  className='bg-[#FF0000] text-white rounded px-[14px] py-[3px] font-semibold text-sm'>Hapus</button>
+                    <button onClick={() => actionHapusJadwalDokter(row.original.id)}  className='bg-[#FF0000] text-white rounded px-[14px] py-[3px] font-semibold text-sm'>Hapus</button>
                 </td>
             )
         
@@ -164,6 +166,29 @@ export default function Dokter({accessToken}) {
         } catch (error) {
             console.log(error)
         }
+    }
+    
+    const hapusJadwalDokter = async () => {
+        try {
+            await toast.promise(
+                ClientRequest.DeleteJadwalDokter(accessToken, idDokter),
+                {
+                    pending: 'Processing...',
+                    success: 'Sukses Delete Jadwal Dokter',
+                    error: 'Gagal Delete Jadwal Dokter',
+                }
+            );
+            getJadwalDokter();
+            setShowDeleteModal(!showDeleteModal);
+        } catch (error) {
+            console.error(error);
+        }
+    }
+    
+    const actionHapusJadwalDokter = async (id) => {
+        setIdDokter(id)
+        setShowDeleteModal(!showDeleteModal)
+        getJadwalDokter()
     }
 
     useEffect(() => {
@@ -301,6 +326,11 @@ export default function Dokter({accessToken}) {
                 </div>
         }
         />
+        <ModalDelete
+                activeModal={showDeleteModal}
+                buttonClose={() => setShowDeleteModal(!showDeleteModal)}
+                submitButton={hapusJadwalDokter}
+            />
         <div className='bg-white flex gap-[32px] min-h-screen'>
             <Sidebar />
             <div className='w-full pr-[32px]'>

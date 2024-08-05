@@ -12,10 +12,35 @@ import toast from 'react-hot-toast'
 import { FaCirclePlus } from 'react-icons/fa6'
 
 export default function PembayaranUgd({accessToken}) {
+
+    const dataObat = [
+        {
+            name: 'Paracetamol',
+            qty: 0
+        },
+        {
+            name: 'Ampicilin',
+            qty: 0
+        }
+    ]
+
+    const dataLayanan = [
+        {
+            name: 'CT Scan',
+            qty: 0
+        },
+        {
+            name: 'Pembersihan Jantung',
+            qty: 0
+        }
+    ]
+
     const [showAddModal, setShowAddModal] = useState(false)
     const [showEditModal, setShowEditModal] = useState(false)
     const [dataPayment, setDataPayment] = useState('')
     const [idPayment, setIdPayment] = useState('')
+    const [obat, setObat] = useState([]);
+    const [tindakan, setTindakan] = useState([]);
     const route = useRouter()
     
     const kolomPembayaran = [
@@ -91,6 +116,8 @@ export default function PembayaranUgd({accessToken}) {
         
         }
     ]
+
+    
     const formik = useFormik({
         initialValues:{
             statusPembayaran:'',
@@ -114,8 +141,14 @@ export default function PembayaranUgd({accessToken}) {
         },
         onSubmit: async (values) => {
             try {
+                const submitValues = {
+                    ...values,
+                    obat, // sertakan obat yang telah diperbarui
+                    tindakan,
+                };
+                console.log(submitValues, 'data submit')
                 await toast.promise(
-                    ClientRequest.UpdateRekamMedis(accessToken, values, idPayment).then((res) => {
+                    ClientRequest.UpdateRekamMedis(accessToken, submitValues, idPayment).then((res) => {
                         return res
                     }),
                     {
@@ -137,6 +170,19 @@ export default function PembayaranUgd({accessToken}) {
         }
     })
 
+    
+
+    const handleQuantityChange = (index, value) => {
+        const updatedobat = [...obat];
+        updatedobat[index].qty = Number(value);
+        setObat(updatedobat);
+    };
+    const handleQuantityTindakanChange = (index, value) => {
+        const updatedtindakan = [...tindakan];
+        updatedtindakan[index].qty = Number(value);
+        setTindakan(updatedtindakan);
+    };
+
     const openModalEdit = async (id) => {
         setIdPayment(id)
         setShowEditModal(!showEditModal)
@@ -146,6 +192,8 @@ export default function PembayaranUgd({accessToken}) {
             formik.setFieldValue('statusPembayaran', res.data.data.status)
             formik.setFieldValue('biayaLayanan', res.data.data.purchased.biayaLayanan)
             formik.setFieldValue('biayaObat', res.data.data.purchased.biayaObat)
+            setObat(res.data.data.obat)
+            setTindakan(res.data.data.tindakan)
         } catch (error) {
             console.log(error)
         }
@@ -172,11 +220,46 @@ export default function PembayaranUgd({accessToken}) {
             buttonClose={ () => setShowEditModal(!showEditModal)}
             width={'1000px'}
             content= {
-                <div className=' w-full space-y-[12px]'>
-                    <div className='grid grid-cols-12 gap-y-8'>
+                <div className='w-full space-y-[12px]'>
+                    
+                    <div className='border-b pb-4'>
+                        <h1 className='text-[#353A40] font-semibold text-lg mb-2'>Keterangan Jumlah Obat</h1>
+                        <div className='pl-1 space-y-[12px]'>
+                            {obat.map((item, idx) => (
+                                <div key={idx} className="grid grid-cols-12 items-center">
+                                    <h1 className='col-span-2 text-[#353A40] font-medium'>{item.name}</h1>
+                                    <input 
+                                        type="number"
+                                        value={item.qty}
+                                        onChange={(e) => handleQuantityChange(idx, e.target.value)}
+                                        className='col-span-9 py-[13px] px-[16px] border rounded w-full outline-none'
+                                        placeholder='Masukkan jumlah'
+                                    />
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                    <div className='border-b pb-4'>
+                        <h1 className='text-[#353A40] font-semibold text-lg mb-2'>Keterangan Jumlah Layanan</h1>
+                        <div className='pl-1 space-y-[12px]'>
+                            {tindakan.map((item, idx) => (
+                                <div key={idx} className="grid grid-cols-12 items-center">
+                                    <h1 className='col-span-2 text-[#353A40] font-medium'>{item.name}</h1>
+                                    <input 
+                                        type="number"
+                                        value={item.qty}
+                                        onChange={(e) => handleQuantityTindakanChange(idx, e.target.value)}
+                                        className='col-span-9 py-[13px] px-[16px] border rounded w-full outline-none'
+                                        placeholder='Masukkan jumlah'
+                                    />
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                    <div className='grid grid-cols-12 gap-y-8  pt-5'>
                         <div className='grid space-y-2 col-span-2 items-center'>
-                            <h1 className='text-[#353A40] font-semibold'>Biaya Obat</h1>
-                            <h1 className='text-[#353A40] font-semibold'>Biaya Layanan</h1>
+                            <h1 className='text-[#353A40] font-semibold'>Total Biaya Obat</h1>
+                            <h1 className='text-[#353A40] font-semibold'>Total Biaya Layanan</h1>
                             <h1 className='text-[#353A40] font-semibold'>Status</h1>
                         </div>
                         <div className='grid space-y-2 col-span-9'>
@@ -198,11 +281,11 @@ export default function PembayaranUgd({accessToken}) {
                             </div>
                         </div>
                     </div>
+                    
                     <div className='flex items-center justify-end gap-3'>
                         <button onClick={() => setShowEditModal(!showEditModal)} className='border-[#0179FF] border text-[#0179FF] font-semibold px-[33px] py-[15px] rounded'>Batal</button>
                         <button onClick={formik.handleSubmit} className='bg-[#0179FF] text-white font-semibold px-[33px] py-[15px] rounded'>Edit</button>
                     </div>
-
                 </div>
             }
         />

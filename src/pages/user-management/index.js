@@ -67,7 +67,6 @@ export default function UserManagement({accessToken}) {
             const requiredFields = [
                 "fullname",
                 "username",
-                "password",
                 "phone",
                 "email",
                 "roleId"

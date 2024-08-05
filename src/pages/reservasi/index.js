@@ -115,7 +115,10 @@ export default function Reservasi({accessToken}) {
         },
         {
             accessorKey: 'jenisPerawatan',
-            header: 'Jenis Pelayanan'
+            header: 'Jenis Pelayanan',
+            cell: ({row}) => (
+                <h1>{row.original.jenisPerawatan === 'rawat-jalan' ? 'Rawat Jalan' : row.original.jenisPerawatan === 'ugd' ? 'UGD' : 'Rawat Inap'}</h1>
+            )
         },
         {
             header: 'Nomor Antrian',

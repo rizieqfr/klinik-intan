@@ -16,6 +16,8 @@ export default function PembayaranRawatInap({accessToken}) {
     const [showEditModal, setShowEditModal] = useState(false)
     const [dataPayment, setDataPayment] = useState('')
     const [idPayment, setIdPayment] = useState('')
+    const [obat, setObat] = useState([]);
+    const [tindakan, setTindakan] = useState([]);
     const route = useRouter()
     
     const kolomPembayaran = [
@@ -130,8 +132,13 @@ export default function PembayaranRawatInap({accessToken}) {
         },
         onSubmit: async (values) => {
             try {
+                const submitValues = {
+                    ...values,
+                    obat, // sertakan obat yang telah diperbarui
+                    tindakan,
+                };
                 await toast.promise(
-                    ClientRequest.UpdateRekamMedis(accessToken, values, idPayment).then((res) => {
+                    ClientRequest.UpdateRekamMedis(accessToken, submitValues, idPayment).then((res) => {
                         return res
                     }),
                     {
@@ -154,6 +161,17 @@ export default function PembayaranRawatInap({accessToken}) {
         }
     })
 
+    const handleQuantityChange = (index, value) => {
+        const updatedobat = [...obat];
+        updatedobat[index].qty = Number(value);
+        setObat(updatedobat);
+    };
+    const handleQuantityTindakanChange = (index, value) => {
+        const updatedtindakan = [...tindakan];
+        updatedtindakan[index].qty = Number(value);
+        setTindakan(updatedtindakan);
+    };
+
     const openModalEdit = async (id) => {
         setIdPayment(id)
         setShowEditModal(!showEditModal)
@@ -162,6 +180,8 @@ export default function PembayaranRawatInap({accessToken}) {
             formik.setFieldValue('statusPembayaran', res.data.data.status)
             formik.setFieldValue('biayaLayanan', res.data.data.purchased.biayaLayanan)
             formik.setFieldValue('biayaObat', res.data.data.purchased.biayaObat)
+            setObat(res.data.data.obat)
+            setTindakan(res.data.data.tindakan)
         } catch (error) {
             console.log(error)
         }
@@ -189,6 +209,40 @@ export default function PembayaranRawatInap({accessToken}) {
             width={'1000px'}
             content= {
                 <div className=' w-full space-y-[12px]'>
+                    <div className='border-b pb-4'>
+                        <h1 className='text-[#353A40] font-semibold text-lg mb-2'>Keterangan Jumlah Obat</h1>
+                        <div className='pl-1 space-y-[12px]'>
+                            {obat.map((item, idx) => (
+                                <div key={idx} className="grid grid-cols-12 items-center">
+                                    <h1 className='col-span-2 text-[#353A40] font-medium'>{item.name}</h1>
+                                    <input 
+                                        type="number"
+                                        value={item.qty}
+                                        onChange={(e) => handleQuantityChange(idx, e.target.value)}
+                                        className='col-span-9 py-[13px] px-[16px] border rounded w-full outline-none'
+                                        placeholder='Masukkan jumlah'
+                                    />
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                    <div className='border-b pb-4'>
+                        <h1 className='text-[#353A40] font-semibold text-lg mb-2'>Keterangan Jumlah Layanan</h1>
+                        <div className='pl-1 space-y-[12px]'>
+                            {tindakan.map((item, idx) => (
+                                <div key={idx} className="grid grid-cols-12 items-center">
+                                    <h1 className='col-span-2 text-[#353A40] font-medium'>{item.name}</h1>
+                                    <input 
+                                        type="number"
+                                        value={item.qty}
+                                        onChange={(e) => handleQuantityTindakanChange(idx, e.target.value)}
+                                        className='col-span-9 py-[13px] px-[16px] border rounded w-full outline-none'
+                                        placeholder='Masukkan jumlah'
+                                    />
+                                </div>
+                            ))}
+                        </div>
+                    </div>
                     <div className='grid grid-cols-12 gap-y-8'>
                         <div className='grid space-y-2 col-span-2 items-center'>
                             <h1 className='text-[#353A40] font-semibold'>Biaya Obat</h1>

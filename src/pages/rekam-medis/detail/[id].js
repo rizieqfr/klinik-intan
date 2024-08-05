@@ -43,6 +43,7 @@ export default function DetailPasien(data) {
                         <h1>Diagnosa: <span className='text-slate-500 font-normal'>{data.data.diagnosa}</span></h1>
                         <h1>Kode Diagnosa: <span className='text-slate-500 font-normal'>{data.data.kode_diagnosa}</span></h1>
                         <h1>Tindakan: <span className='text-slate-500 font-normal'>{ data.data.tindakan}</span></h1>
+                        <h1>Obat: <span className='text-slate-500 font-normal'>{data.data?.obat?.map(cat => cat.name).join(', ')}</span></h1>
                     </div>
                 {/* </div> */}
                 <hr className='border my-[32px]'/>

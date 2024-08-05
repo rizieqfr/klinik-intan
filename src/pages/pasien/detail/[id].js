@@ -32,6 +32,9 @@ export default function DetailPasien(data) {
         {
             header: 'Jenis Pelayanan',
             accessorKey: 'pelayanan',
+            cell: ({row}) => (
+                <h1>{row.original.pelayanan === 'rawat-jalan' ? 'Rawat Jalan' : row.original.pelayanan === 'ugd' ? 'UGD' : 'Rawat Inap'}</h1>
+            )
         },
         {
             header: 'Keluhan',
@@ -40,6 +43,16 @@ export default function DetailPasien(data) {
         {
             header: 'Tindakan',
             accessorKey: 'tindakan',
+            cell: ({row}) => (
+                <h1>{JSON.parse(row.original.tindakan).map(cat => cat.name).join(', ')}</h1>
+            )
+        },
+        {
+            header: 'Obat',
+            accessorKey: 'obat',
+            cell: ({row}) => (
+                <h1>{JSON.parse(row.original.obat).map(cat => cat.name).join(', ')}</h1>
+            )
         },
         {
             header: 'Diagnosa',

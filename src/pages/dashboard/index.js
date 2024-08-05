@@ -125,7 +125,7 @@ export const getServerSideProps = withSession(async ({ req }) => {
       const res = await ClientRequest.CountDashboard(accessToken)
       return {
         props: {
-          dataDashboard: res.data.data,
+          dataDashboard: res.data?.data,
           accessToken
         },
       };

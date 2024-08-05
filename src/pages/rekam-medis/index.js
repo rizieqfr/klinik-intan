@@ -17,6 +17,10 @@ export default function RekamMedis({accessToken, dataPasien, dataReservasi}) {
     const [showEditModal, setShowEditModal] = useState(false)
     const [idRekamMedis, setIdRekamMedis] = useState('')
     const [reservasi, setReservasi] = useState([])
+    const [obatList, setObatList] = useState([])
+    const [tindakantList, setTindakanList] = useState([])
+
+    
 
     
     const [dataRekamMedis, setDataRekamMedis] = useState('');
@@ -71,10 +75,16 @@ export default function RekamMedis({accessToken, dataPasien, dataReservasi}) {
         {
             header: 'Tindakan',
             accessorKey: 'tindakan',
+            cell: ({row}) => (
+                <h1>{row.original.tindakan.map(cat => cat.name).join(', ')}</h1>
+            )
         },
         {
             header: 'Obat',
             accessorKey: 'obat',
+            cell: ({row}) => (
+                <h1>{row.original.obat.map(cat => cat.name).join(', ')}</h1>
+            )
         },
         {
             accessorKey: 'id',
@@ -95,10 +105,10 @@ export default function RekamMedis({accessToken, dataPasien, dataReservasi}) {
             idReservasi:'',
             pelayanan:'',  
             keluhan:'', 
-            obat:'', 
+            obat: [], 
+            tindakan:[],
             diagnosa:'',
             kodeDiagnosa: '', 
-            tindakan:'',
             biayaLayanan: 0,
             biayaObat: 0,
             statusPembayaran: 'BELUM LUNAS'
@@ -108,9 +118,6 @@ export default function RekamMedis({accessToken, dataPasien, dataReservasi}) {
 
             if (!values.diagnosa) {
                 errors.diagnosa = 'Diagnosa wajib diisi';
-            }
-            if (!values.obat) {
-                errors.obat = 'Obat wajib diisi';
             }
             if (!values.kodeDiagnosa) {
                 errors.kodeDiagnosa = 'Kode Diagnosa wajib diisi';
@@ -175,7 +182,42 @@ export default function RekamMedis({accessToken, dataPasien, dataReservasi}) {
     const handleAutofill = (e) => {
         console.log(e.target.value, 'handlechange')
         debounceAutofill(e.target.value)
-      }
+    }
+
+    const handleAddObat = () => {
+        if (formik.values.obat) {
+            const updatedObatList = [
+                ...obatList,
+                { name: formik.values.obat, qty: 0 },
+            ];
+            setObatList(updatedObatList);
+            formik.setFieldValue('obat', updatedObatList);
+        }
+    };
+    
+    const handleRemoveObat = (index) => {
+        const newObatList = obatList.filter((_, i) => i !== index);
+        setObatList(newObatList);
+        formik.setFieldValue('obat', newObatList);
+    };
+
+    const handleAddTindakan = () => {
+        if (formik.values.tindakan) {
+            const updatedTindakanList = [
+                ...tindakantList,
+                { name: formik.values.tindakan, qty: 0 },
+            ];
+            setTindakanList(updatedTindakanList);
+            formik.setFieldValue('tindakan', updatedTindakanList);
+        }
+    };
+    
+    const handleRemoveTindakan = (index) => {
+        const newTindakanList = tindakantList.filter((_, i) => i !== index);
+        setTindakanList(newTindakanList);
+        formik.setFieldValue('tindakan', newTindakanList);
+    };
+    
     
     const debounceAutofill = debounce(async (id) => {
     try {
@@ -207,16 +249,6 @@ export default function RekamMedis({accessToken, dataPasien, dataReservasi}) {
         }
     }
 
-    // const handleServiceChange = (serviceId, action) => {
-    //     const selectedService = dataLayanan.find(service => service.id === serviceId);
-    //     console.log(selectedService, 'selectedService')
-    //     if (action === 'add') {
-    //     setSelectedServices([...selectedServices, selectedService]);
-    //     } else if (action === 'delete') {
-    //     const updatedServices = selectedServices.filter(service => service.id !== serviceId);
-    //     setSelectedServices(updatedServices);
-    //     }
-    // };
 
     useEffect(() => {
         getRekamMedis()
@@ -232,21 +264,22 @@ export default function RekamMedis({accessToken, dataPasien, dataReservasi}) {
             content= {
                 <div className=' w-full space-y-[12px]'>
                     <div className='grid grid-cols-12 gap-y-8'>
-                        <div className='grid space-y-2 col-span-2 items-center text-[#353A40] font-semibold'>
+                        <div className='grid space-y-4 col-span-2 items-start text-[#353A40] font-semibold'>
                             <h1>Pasien</h1>
                             <h1>Jenis Pelayanan</h1>
                             <h1>Keluhan</h1>
                             <h1>Diagnosa</h1>
                             <h1>Kode Diagnosa</h1>
-                            <h1>Tindakan</h1>
-                            <h1>Obat</h1>
                         </div>
-                        <div className='grid space-y-2 col-span-9'>
-                            <select onChange={handleAutofill} className='py-[13px] px-[16px] border rounded w-full outline-none' name="patientId" >
+                        <div className='grid space-y-4 col-span-10'>
+                            <select 
+                                onChange={handleAutofill} 
+                                className='py-[13px] px-[16px] border rounded w-full outline-none' 
+                                name="patientId" 
+                            >
                                 <option value="">Pilih Pasien dalam Antrian...</option>
                                 {Object.values(reservasi).filter(item => item.status === false).length > 0 ? (
                                     <>
-                                        <option value="">Pilih Pasien dalam Antrian...</option>
                                         {Object.values(reservasi)
                                             .filter(item => item.status === false)
                                             .map((item, idx) => (
@@ -257,32 +290,133 @@ export default function RekamMedis({accessToken, dataPasien, dataReservasi}) {
                                         }
                                     </>
                                 ) : (
-                                    <option disabled  >Tidak ada pasien dalam antrian</option>
+                                    <option disabled >Tidak ada pasien dalam antrian</option>
                                 )}
                             </select>
                             {formik.touched.patientId && formik.errors.patientId && <p className='text-xs font-medium text-red-600 ml-1'>*{formik.errors.patientId}</p>}
 
-                            <input type="text" className='py-[13px] px-[16px] border rounded w-full outline-none cursor-not-allowed bg-slate-200' readOnly onChange={formik.handleChange} value={formik.values.pelayanan} name='pelayanan' placeholder='Jenis Pelayanan...'/>
+                            <input 
+                                type="text" 
+                                className='py-[13px] px-[16px] border rounded w-full outline-none cursor-not-allowed bg-slate-200' 
+                                readOnly 
+                                onChange={formik.handleChange} 
+                                value={formik.values.pelayanan} 
+                                name='pelayanan' 
+                                placeholder='Jenis Pelayanan...'
+                            />
                             {formik.touched.pelayanan && formik.errors.pelayanan && <p className='text-xs font-medium text-red-600 ml-1'>*{formik.errors.pelayanan}</p>}
 
-                            <input type="text" className='py-[13px] px-[16px] border rounded w-full outline-none cursor-not-allowed bg-slate-200' onChange={formik.handleChange} value={formik.values.keluhan} readOnly name='keluhan' placeholder='Keluhan...'/>
+                            <input 
+                                type="text" 
+                                className='py-[13px] px-[16px] border rounded w-full outline-none cursor-not-allowed bg-slate-200' 
+                                onChange={formik.handleChange} 
+                                value={formik.values.keluhan} 
+                                readOnly 
+                                name='keluhan' 
+                                placeholder='Keluhan...'
+                            />
                             {formik.touched.keluhan && formik.errors.keluhan && <p className='text-xs font-medium text-red-600 ml-1'>*{formik.errors.keluhan}</p>}
 
-                            <input type="text" className='py-[13px] px-[16px] border rounded w-full outline-none' onChange={formik.handleChange} name='diagnosa' placeholder='Diagnosa...'/>
+                            <input 
+                                type="text" 
+                                className='py-[13px] px-[16px] border rounded w-full outline-none' 
+                                onChange={formik.handleChange} 
+                                name='diagnosa' 
+                                placeholder='Diagnosa...'
+                            />
                             {formik.touched.diagnosa && formik.errors.diagnosa && <p className='text-xs font-medium text-red-600 ml-1'>*{formik.errors.diagnosa}</p>}
 
-                            <input type="text" className='py-[13px] px-[16px] border rounded w-full outline-none' onChange={formik.handleChange} name='kodeDiagnosa' placeholder='Kode Diagnosa...'/>
+                            <input 
+                                type="text" 
+                                className='py-[13px] px-[16px] border rounded w-full outline-none' 
+                                onChange={formik.handleChange} 
+                                name='kodeDiagnosa' 
+                                placeholder='Kode Diagnosa...'
+                            />
                             {formik.touched.kodeDiagnosa && formik.errors.kodeDiagnosa && <p className='text-xs font-medium text-red-600 ml-1'>*{formik.errors.kodeDiagnosa}</p>}
-
-                            <input type="text" className='py-[13px] px-[16px] border rounded w-full outline-none' onChange={formik.handleChange} name='tindakan' placeholder='Tindakan...'/>
-                            {formik.touched.tindakan && formik.errors.tindakan && <p className='text-xs font-medium text-red-600 ml-1'>*{formik.errors.tindakan}</p>}
-
-                            <input type="text" className='py-[13px] px-[16px] border rounded w-full outline-none' onChange={formik.handleChange} name='obat' placeholder='Obat...'/>
-                            {formik.touched.obat && formik.errors.obat && <p className='text-xs font-medium text-red-600 ml-1'>*{formik.errors.obat}</p>}
-                            
 
                         </div>
                     </div>
+
+                    <div className='flex gap-6 pt-6'>
+                        <h1 className='text-[#353A40] font-semibold'>Tindakan</h1>
+                        <div className='w-full'>
+                            <div className='mb-4 flex gap-2 w-full'>
+                                <input 
+                                    type='text' 
+                                    className='py-[13px] px-[16px] border rounded w-full outline-none' 
+                                    onChange={formik.handleChange} 
+                                    name='tindakan' 
+                                    placeholder='Tambah Tindakan...'
+                                />
+                                {formik.touched.tindakan && formik.errors.tindakan && (
+                                    <p className='text-xs font-medium text-red-600 ml-1'>*{formik.errors.tindakan}</p>
+                                )}
+                                <button 
+                                    type='button' 
+                                    className='py-[10px] px-[16px] bg-blue-500 text-white font-semibold border rounded text-xs outline-none' 
+                                    onClick={handleAddTindakan}
+                                >
+                                    Tambah Tindakan
+                                </button>
+                            </div>
+
+                            <ul className='mb-4'>
+                                {tindakantList.map((item, index) => (
+                                    <li key={index} className='flex justify-between items-center mb-2 px-3'>
+                                        <span className='text-[#353A40]'>{index+1}.  {item.name}</span>
+                                        <button
+                                            type='button'
+                                            className='text-red-500 font-semibold'
+                                            onClick={() => handleRemoveTindakan(index)}
+                                        >
+                                            Hapus
+                                        </button>
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
+                    </div>
+                    <div className='flex gap-14 mt-6'>
+                        <h1 className='text-[#353A40] font-semibold'>Obat</h1>
+                        <div className='w-full'>
+                            <div className='mb-4 flex gap-2 w-full'>
+                                <input 
+                                    type='text' 
+                                    className='py-[13px] px-[16px] border rounded w-full outline-none' 
+                                    onChange={formik.handleChange} 
+                                    name='obat' 
+                                    placeholder='Tambah Obat...'
+                                />
+                                {formik.touched.obat && formik.errors.obat && (
+                                    <p className='text-xs font-medium text-red-600 ml-1'>*{formik.errors.obat}</p>
+                                )}
+                                <button 
+                                    type='button' 
+                                    className='py-[10px] px-[16px] bg-blue-500 text-white font-semibold border rounded text-xs outline-none' 
+                                    onClick={handleAddObat}
+                                >
+                                    Tambah Obat
+                                </button>
+                            </div>
+
+                            <ul className='mb-4'>
+                                {obatList.map((item, index) => (
+                                    <li key={index} className='flex justify-between items-center mb-2 px-3'>
+                                        <span className='text-[#353A40]'> {index+1}.  {item.name}</span>
+                                        <button
+                                            type='button'
+                                            className='text-red-500 font-semibold'
+                                            onClick={() => handleRemoveObat(index)}
+                                        >
+                                            Hapus
+                                        </button>
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
+                    </div>
+
 
                     <div className='flex items-center justify-end gap-3'>
                         <button onClick={() => setShowAddModal(!showAddModal)} className='border-[#0179FF] border text-[#0179FF] font-semibold px-[33px] py-[15px] rounded'>Cancel</button>

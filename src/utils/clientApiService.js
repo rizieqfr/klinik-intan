@@ -294,7 +294,7 @@ class ClientRequest {
         })
     }
     
-    static DeleteRekamMedis(token, id) {
+    static DeleteJadwalDokter(token, id) {
         let path = `jadwal-dokter/${id}`;
         return request(`${this.urlAPI()}${path}`, {
             method: 'DELETE',
