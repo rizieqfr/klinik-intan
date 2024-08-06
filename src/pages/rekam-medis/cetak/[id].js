@@ -47,8 +47,10 @@ export default function CetakRekamMedis({dataRekamMedis}) {
                     <h1>Keluhan</h1>
                     <h1>Diagnosa</h1>
                     <h1>Tindakan</h1>
+                    <h1>Obat</h1>
                 </div>
                 <div className='col-span-1 space-y-4'>
+                    <h1>:</h1>
                     <h1>:</h1>
                     <h1>:</h1>
                     <h1>:</h1>
@@ -72,7 +74,8 @@ export default function CetakRekamMedis({dataRekamMedis}) {
                     <h1>{dataRekamMedis.riwayatAlergiLainya || '-'}</h1>
                     <h1>{dataRekamMedis.keluhan || '-'}</h1>
                     <h1>{dataRekamMedis.diagnosa || '-'}</h1>
-                    <h1>{dataRekamMedis.tindakan || '-' }</h1>
+                    <h1>{dataRekamMedis.tindakan.map(cat => cat.name) || '-' }</h1>
+                    <h1>{dataRekamMedis.obat.map(cat => cat.name) || '-' }</h1>
                 </div>
             </div>
         </div>
