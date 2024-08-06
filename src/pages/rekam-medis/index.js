@@ -19,7 +19,8 @@ export default function RekamMedis({accessToken, dataPasien, dataReservasi}) {
     const [reservasi, setReservasi] = useState([])
     const [obatList, setObatList] = useState([])
     const [tindakantList, setTindakanList] = useState([])
-
+    const [obat, setObat] = useState()
+    const [tindakan, setTindakan] = useState()
     
 
     
@@ -71,19 +72,23 @@ export default function RekamMedis({accessToken, dataPasien, dataReservasi}) {
         {
             header: 'Jenis Pelayanan',
             accessorKey: 'pelayanan',
+            cell: ({row}) => (
+                <h1>{row.original.pelayanan === 'rawat-jalan' ? 'Rawat Jalan' : row.original.pelayanan === 'ugd' ? 'UGD' : 'Rawat Inap'}</h1>
+            )
+            
         },
         {
             header: 'Tindakan',
             accessorKey: 'tindakan',
             cell: ({row}) => (
-                <h1>{row.original.tindakan.map(cat => cat.name).join(', ')}</h1>
+                <h1>{row.original?.tindakan?.map(cat => cat.name).join(', ')}</h1>
             )
         },
         {
             header: 'Obat',
             accessorKey: 'obat',
             cell: ({row}) => (
-                <h1>{row.original.obat.map(cat => cat.name).join(', ')}</h1>
+                <h1>{row.original?.obat?.map(cat => cat.name).join(', ')}</h1>
             )
         },
         {
@@ -92,7 +97,7 @@ export default function RekamMedis({accessToken, dataPasien, dataReservasi}) {
             cell: ({row}) => (
                 <td className='flex justify-center'>
                     <Link href={`rekam-medis/detail/${row.original.id}`}  className='bg-[#0080CC] text-white rounded px-[14px] py-[3px] font-semibold text-sm mr-2'>Detail</Link>
-                    <button onClick={() => openModalEdit(row.original.id)} className='bg-[#FEC107] text-white rounded px-[14px] py-[3px] font-semibold text-sm mr-2'>Edit</button>
+                    {/* <button onClick={() => openModalEdit(row.original.id)} className='bg-[#FEC107] text-white rounded px-[14px] py-[3px] font-semibold text-sm mr-2'>Edit</button> */}
                     <Link href={`rekam-medis/cetak/${row.original.id}`} className='bg-green-500 text-white rounded px-[14px] py-[3px] font-semibold text-sm'>Cetak</Link>
                 </td>
             )
@@ -130,54 +135,63 @@ export default function RekamMedis({accessToken, dataPasien, dataReservasi}) {
         return errors;
         },
         onSubmit: async (values) => {
-            console.log(values, 'value yang dikirim')
+            console.log(values, 'value yang dikirim');
             try {
+                if (!Array.isArray(values.obat) || values.obat.length === 0) {
+                    toast.error('Pastikan menambahkan setidaknya satu obat');
+                    return;
+                }
+                if (!Array.isArray(values.tindakan) || values.tindakan.length === 0) {
+                    toast.error('Pastikan menambahkan setidaknya satu tindakan');
+                    return;
+                }
+        
                 if (showAddModal === true) {
-                    // Tambah Pasien
                     toast.promise(
                         ClientRequest.CreateRekamMedis(accessToken, values).then((res) => {
-                        return res;
-                    }),
-                    {
-                        loading: 'Processing...',
-                        success: (res) =>{
-                            console.log('respon yang didapat', res)
-                            formik.resetForm();
-                            getRekamMedis()
-                            setShowAddModal(!showAddModal);
-                            return `${res.data.message}`
-                        } ,
-                        error: (error) => {
-                            console.log('error nih',error)
-                            return `${error.response.data.message}`
-                        },
-                    }
+                            return res;
+                        }),
+                        {
+                            loading: 'Processing...',
+                            success: (res) => {
+                                console.log('respon yang didapat', res);
+                                formik.resetForm();
+                                getRekamMedis();
+                                setShowAddModal(!showAddModal);
+                                return `${res.data.message}`;
+                            },
+                            error: (error) => {
+                                console.log('error nih', error);
+                                return `${error.response.data.message}`
+                            },
+                        }
                     );
-            } else {
-                // Edit pasien
-                toast.promise(
-                    ClientRequest.UpdateRekamMedis(accessToken, values, idRekamMedis).then((res) => {
-                    return res;
-                }),
-                {
-                    loading: 'Processing...',
-                    success: (res) =>{
-                        formik.resetForm();
-                        getRekamMedis()
-                        setShowEditModal(!showEditModal);
-                        return `${res.data.message}`
-                    } ,
-                    error: (error) => {
-                        return `${error.response.data.message}`
-                    },
-                }
-                );
+                } else {
+                    // Edit Pasien
+                    toast.promise(
+                        ClientRequest.UpdateRekamMedis(accessToken, values, idRekamMedis).then((res) => {
+                            return res;
+                        }),
+                        {
+                            loading: 'Processing...',
+                            success: (res) => {
+                                formik.resetForm();
+                                getRekamMedis();
+                                setShowEditModal(!showEditModal);
+                                return `${res.data.message}`;
+                            },
+                            error: (error) => {
+                                return `${error.response.data.message}`;
+                            },
+                        }
+                    )
                 }
             } catch (error) {
                 console.error('Error during adding/editing pasien:', error);
                 toast.error('Terjadi kesalahan saat menambah/mengedit pasien.');
             }
-        },
+        }
+        
     })
     const handleAutofill = (e) => {
         console.log(e.target.value, 'handlechange')
@@ -185,10 +199,10 @@ export default function RekamMedis({accessToken, dataPasien, dataReservasi}) {
     }
 
     const handleAddObat = () => {
-        if (formik.values.obat) {
+        if (obat) {
             const updatedObatList = [
                 ...obatList,
-                { name: formik.values.obat, qty: 0 },
+                { name: obat, qty: 0 },
             ];
             setObatList(updatedObatList);
             formik.setFieldValue('obat', updatedObatList);
@@ -202,10 +216,10 @@ export default function RekamMedis({accessToken, dataPasien, dataReservasi}) {
     };
 
     const handleAddTindakan = () => {
-        if (formik.values.tindakan) {
+        if (tindakan) {
             const updatedTindakanList = [
                 ...tindakantList,
-                { name: formik.values.tindakan, qty: 0 },
+                { name: tindakan, qty: 0 },
             ];
             setTindakanList(updatedTindakanList);
             formik.setFieldValue('tindakan', updatedTindakanList);
@@ -345,8 +359,8 @@ export default function RekamMedis({accessToken, dataPasien, dataReservasi}) {
                                 <input 
                                     type='text' 
                                     className='py-[13px] px-[16px] border rounded w-full outline-none' 
-                                    onChange={formik.handleChange} 
                                     name='tindakan' 
+                                    onChange={(e) => setTindakan(e.target.value)}
                                     placeholder='Tambah Tindakan...'
                                 />
                                 {formik.touched.tindakan && formik.errors.tindakan && (
@@ -384,8 +398,8 @@ export default function RekamMedis({accessToken, dataPasien, dataReservasi}) {
                                 <input 
                                     type='text' 
                                     className='py-[13px] px-[16px] border rounded w-full outline-none' 
-                                    onChange={formik.handleChange} 
                                     name='obat' 
+                                    onChange={(e) => setObat(e.target.value)}
                                     placeholder='Tambah Obat...'
                                 />
                                 {formik.touched.obat && formik.errors.obat && (
