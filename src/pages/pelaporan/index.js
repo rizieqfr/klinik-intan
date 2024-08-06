@@ -57,15 +57,16 @@ export default function Pelaporan({dataPasien, dataRekamMedis, dataPembayaran, d
         saveAs(excelBlob, 'Rekap Data Dokter.xlsx');
     };
     const exportRekamMedis = () => {
-        const Headers = ['Nama Lengkap', 'Tanggal Pembuatan RM', 'Jenis Pelayanan', 'Keluhan', 'Diagnosa', 'Kode Diagnosa', 'Tindakan'];
-        const rekamMedisData = rekamMedis.map(({ fullname, createdAt, pelayanan, keluhan, diagnosa, kode_diagnosa, tindakan,}) => ({
+        const Headers = ['Nama Lengkap', 'Tanggal Pembuatan RM', 'Jenis Pelayanan', 'Keluhan', 'Diagnosa', 'Kode Diagnosa', 'Tindakan', 'Obat'];
+        const rekamMedisData = rekamMedis.map(({ fullname, createdAt, pelayanan, keluhan, diagnosa, kode_diagnosa, tindakan, obat}) => ({
             'Nama Lengkap': fullname ? fullname : '-',
             'Tanggal Pembuatan RM': createdAt ? createdAt : '-',
             'Jenis Pelayanan': pelayanan? pelayanan : '-',
             'Keluhan': keluhan? keluhan : '-',
             'Diagnosa': diagnosa? diagnosa : '-',
             'Kode Diagnosa': kode_diagnosa? kode_diagnosa : '-',
-            'Tindakan': tindakan? tindakan : '-',
+            'Tindakan': tindakan? tindakan.map(cat => cat.name).join(', ') : '-',
+            'Obat': obat? obat.map(cat => cat.name).join(', ') : '-',
         }));
         const worksheetGrade = XLSX.utils.json_to_sheet(rekamMedisData, { header: Headers });
         const workbook = XLSX.utils.book_new();
